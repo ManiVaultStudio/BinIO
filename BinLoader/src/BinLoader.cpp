@@ -88,7 +88,7 @@ void BinLoader::loadData()
 
     if (ok && !_dataSetName.isEmpty()) {
         QString name;
-        if (_isDerived)
+        if (_isDerived & (_sourceName != ""))
             name = _core->createDerivedData(_dataSetName, _sourceName);
         else
             name = _core->addData("Points", _dataSetName);

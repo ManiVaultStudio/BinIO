@@ -50,7 +50,7 @@ public:
         dataSetsLabel = new QLabel(tr("Data sets:"));
 
         dataSetsBox = new QComboBox();
-        dataSetsBox->addItem(" ");
+        dataSetsBox->addItem("");
         for (QString& dataSetName : dataSetNames)
             dataSetsBox->addItem(dataSetName);
         dataSetsBox->setEnabled(false);
