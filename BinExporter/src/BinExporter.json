@@ -1,0 +1,6 @@
+{
+    "name" : "BIN Exporter",
+    "menuName" : "BIN (.bin)",
+    "version" : "1",
+    "dependencies" : ["Points"]
+}
