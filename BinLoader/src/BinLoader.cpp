@@ -21,7 +21,7 @@ Q_PLUGIN_METADATA(IID "nl.tudelft.BinLoader")
 
 BinLoader::~BinLoader(void)
 {
-    
+
 }
 
 void BinLoader::init()
@@ -32,7 +32,7 @@ void BinLoader::init()
 void BinLoader::loadData()
 {
     const QString fileName = AskForFileName(tr("BIN Files (*.bin)"));
-    
+
     // Don't try to load a file if the dialog was cancelled or the file name is empty
     if (fileName.isNull() || fileName.isEmpty())
         return;
@@ -56,9 +56,10 @@ void BinLoader::loadData()
 
     std::vector<float> data;
 
-    BinLoadingInputDialog inputDialog(nullptr);
-    inputDialog.setModal(true);
+    std::vector<QString> dataSetNames = _core->requestAllDataNames(std::vector<hdps::DataType> {PointType});
 
+    BinLoadingInputDialog inputDialog(nullptr, QFileInfo(fileName).baseName(), dataSetNames);
+    inputDialog.setModal(true);
     connect(&inputDialog, &BinLoadingInputDialog::closeDialog, this, &BinLoader::dialogClosed);
 
     int ok = inputDialog.exec();
@@ -86,8 +87,12 @@ void BinLoader::loadData()
     }
 
     if (ok && !_dataSetName.isEmpty()) {
-        QString name = _core->addData("Points", _dataSetName);
-        
+        QString name;
+        if (_isDerived & (_sourceName != ""))
+            name = _core->createDerivedData(_dataSetName, _sourceName);
+        else
+            name = _core->addData("Points", _dataSetName);
+
         Points& points = _core->requestData<Points>(name);
 
         points.setData(data.data(), data.size() / _numDimensions, _numDimensions);
@@ -100,12 +105,16 @@ void BinLoader::loadData()
     }
 }
 
-void BinLoader::dialogClosed(unsigned int numDimensions, BinaryDataType dataType, QString dataSetName)
+void BinLoader::dialogClosed(unsigned int numDimensions, BinaryDataType dataType, QString dataSetName, bool isDerived, QString sourceName)
 {
     _numDimensions = numDimensions;
     _dataType = dataType;
     _dataSetName = dataSetName;
+    _isDerived = isDerived;
+    _sourceName = sourceName;
     qDebug() << _numDimensions << _dataType << _dataSetName;
+    if (isDerived)
+        qDebug() << "Derived from " << sourceName;
 }
 
 // =============================================================================

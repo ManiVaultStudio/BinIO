@@ -4,9 +4,10 @@
 
 #include <QDialog>
 #include <QCheckBox>
-#include <QHBoxLayout>
+#include <QGridLayout>
 #include <QPushButton>
 #include <QComboBox>
+#include <QCheckBox>
 #include <QSpinBox>
 #include <QLabel>
 #include <QLineEdit>
@@ -26,13 +27,13 @@ class BinLoadingInputDialog : public QDialog
 {
     Q_OBJECT
 public:
-    BinLoadingInputDialog(QWidget* parent) :
+    BinLoadingInputDialog(QWidget* parent, QString fileName, std::vector<QString> dataSetNames) :
         QDialog(parent)
     {
         setWindowTitle(tr("Binary Loader"));
 
         dataNameInput = new QLineEdit();
-        dataNameInput->setText("Dataset");
+        dataNameInput->setText(fileName);
 
         dataTypeInput = new QComboBox();
         dataTypeInput->addItem("Float");
@@ -45,23 +46,41 @@ public:
         numDimsLabel = new QLabel(tr("Number of dimensions:"));
         numDimsLabel->setBuddy(numDimsInput);
 
+        isDerived = new QCheckBox("Derived?");
+        dataSetsLabel = new QLabel(tr("Data sets:"));
+
+        dataSetsBox = new QComboBox();
+        dataSetsBox->addItem("");
+        for (QString& dataSetName : dataSetNames)
+            dataSetsBox->addItem(dataSetName);
+        dataSetsBox->setEnabled(false);
+
         loadButton = new QPushButton(tr("Load file"));
         loadButton->setDefault(true);
 
         connect(loadButton, &QPushButton::pressed, this, &BinLoadingInputDialog::closeDialogAction);
         connect(this, &BinLoadingInputDialog::closeDialog, this, &QDialog::accept);
+        connect(isDerived, &QCheckBox::stateChanged, dataSetsBox, &QLabel::setEnabled);
 
-        QHBoxLayout *layout = new QHBoxLayout();
-        layout->addWidget(dataNameInput);
-        layout->addWidget(numDimsLabel);
-        layout->addWidget(numDimsInput);
-        layout->addWidget(dataTypeInput);
-        layout->addWidget(loadButton);
+        QGridLayout *layout = new QGridLayout;
+        layout->addWidget(new QLabel(tr("Name:")), 0, 0);
+
+        layout->addWidget(dataNameInput, 0, 1);
+        layout->addWidget(numDimsLabel, 0, 2);
+        layout->addWidget(numDimsInput, 0, 3);
+        layout->addWidget(dataTypeInput, 0, 4);
+
+        layout->addWidget(isDerived, 1, 1);
+        layout->addWidget(dataSetsLabel, 1, 2);
+        layout->addWidget(dataSetsBox, 1, 3);
+
+        layout->addWidget(loadButton, 1, 5);
+
         setLayout(layout);
     }
 
 signals:
-    void closeDialog(unsigned int numDimensions, BinaryDataType dataType, QString dataSetName);
+    void closeDialog(unsigned int numDimensions, BinaryDataType dataType, QString dataSetName, bool isDerived, QString sourceName);
 
 public slots:
     void closeDialogAction()
@@ -72,7 +91,7 @@ public slots:
         else if (dataTypeInput->currentText() == "Unsigned Byte")
             dataType = BinaryDataType::UBYTE;
 
-        emit closeDialog(numDimsInput->value(), dataType, dataNameInput->text());
+        emit closeDialog(numDimsInput->value(), dataType, dataNameInput->text(), isDerived->isChecked(), dataSetsBox->currentText());
     }
 
 private:
@@ -80,6 +99,9 @@ private:
     QComboBox* dataTypeInput;
     QLabel* numDimsLabel;
     QSpinBox* numDimsInput;
+    QCheckBox* isDerived;
+    QComboBox* dataSetsBox;
+    QLabel* dataSetsLabel;
 
     QPushButton* loadButton;
 };
@@ -94,18 +116,20 @@ class BinLoader : public QObject, public LoaderPlugin
 public:
     BinLoader() : LoaderPlugin("BIN Loader") { }
     ~BinLoader(void) override;
-    
+
     void init() override;
 
     void loadData() Q_DECL_OVERRIDE;
 
 public slots:
-    void dialogClosed(unsigned int numDimensions, BinaryDataType dataType, QString dataSetName);
+    void dialogClosed(unsigned int numDimensions, BinaryDataType dataType, QString dataSetName, bool isDerived, QString sourceName);
 
 private:
     unsigned int _numDimensions;
     BinaryDataType _dataType;
     QString _dataSetName;
+    bool _isDerived;
+    QString _sourceName;
 };
 
 
@@ -119,10 +143,10 @@ class BinLoaderFactory : public LoaderPluginFactory
     Q_OBJECT
     Q_PLUGIN_METADATA(IID   "nl.tudelft.BinLoader"
                       FILE  "BinLoader.json")
-    
+
 public:
     BinLoaderFactory(void) {}
     ~BinLoaderFactory(void) override {}
-    
+
     LoaderPlugin* produce() override;
 };
