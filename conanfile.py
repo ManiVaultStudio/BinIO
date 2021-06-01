@@ -81,8 +81,7 @@ class BinIOPluginConan(ConanFile):
         # If the user has no preference in HDPS_INSTALL_DIR
         # simply set the install dir
         if not os.environ.get('HDPS_INSTALL_DIR', None):
-            os.environ['HDPS_INSTALL_DIR'] =\
-                os.path.join(self.build_folder, "install")
+            os.environ['HDPS_INSTALL_DIR'] = os.path.join(self.build_folder, "install")
         print('HDPS_INSTALL_DIR: ', os.environ['HDPS_INSTALL_DIR'])
         self.install_dir = os.environ['HDPS_INSTALL_DIR']
 
