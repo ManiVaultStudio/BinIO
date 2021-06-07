@@ -99,14 +99,14 @@ class BinIOPluginConan(ConanFile):
     def package(self):
         package_dir = os.path.join(self.build_folder, "install")
         print('Packaging install dir: ', package_dir)
-        #subprocess.run(["cmake",
-        #                "--install", self.build_folder,
-        #                "--config", "Debug",
-        #                "--prefix", os.path.join(package_dir, "Debug")])
-        #subprocess.run(["cmake",
-        #                "--install", self.build_folder,
-        #                "--config", "Release",
-        #                "--prefix", os.path.join(package_dir, "Release")])
+        subprocess.run(["cmake",
+                       "--install", self.build_folder,
+                       "--config", "Debug",
+                       "--prefix", os.path.join(package_dir, "Debug")])
+        subprocess.run(["cmake",
+                       "--install", self.build_folder,
+                       "--config", "Release",
+                       "--prefix", os.path.join(package_dir, "Release")])
         self.copy(pattern="*", src=package_dir)
         # Add the debug support files to the package
         # (*.pdb) if building the Visual Studio version
