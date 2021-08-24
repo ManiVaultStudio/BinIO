@@ -15,6 +15,8 @@
 
 Q_PLUGIN_METADATA(IID "nl.tudelft.BinLoader")
 
+using namespace hdps;
+
 // =============================================================================
 // View
 // =============================================================================
@@ -123,5 +125,12 @@ void BinLoader::dialogClosed(unsigned int numDimensions, BinaryDataType dataType
 
 LoaderPlugin* BinLoaderFactory::produce()
 {
-    return new BinLoader();
+    return new BinLoader(this);
+}
+
+DataTypes BinLoaderFactory::supportedDataTypes() const
+{
+    DataTypes supportedTypes;
+    supportedTypes.append(PointType);
+    return supportedTypes;
 }
