@@ -19,40 +19,40 @@ Q_PLUGIN_METADATA(IID "nl.tudelft.BinExporter")
 
 using namespace hdps;
 
-// =============================================================================
-// View
-// =============================================================================
+BinExporter::BinExporter(const PluginFactory* factory) :
+    WriterPlugin(factory)
+{
+}
 
 BinExporter::~BinExporter(void)
 {
-
 }
 
 void BinExporter::init()
 {
-
 }
 
 void BinExporter::writeData()
 {
-    // Get all data set names from the core 
-    // currently only point data set 
-    std::vector<QString> dataSetNames = _core->requestAllDataNames(std::vector<hdps::DataType> {PointType});
-
     // Let the user select one of those data sets
-    BinExporterDialog inputDialog(nullptr, dataSetNames);
+    BinExporterDialog inputDialog(nullptr);
+    
     inputDialog.setModal(true);
-    connect(&inputDialog, &BinExporterDialog::closeDialog, this, &BinExporter::dialogClosed);
+
+    connect(&inputDialog, &BinExporterDialog::closeDialog, this, [this](bool onlyIdices) {
+        _onlyIdices = onlyIdices;
+    });
+
     int ok = inputDialog.exec();
 
-    if ((ok == QDialog::Accepted) && (_dataSetName != "")) {
+    if ((ok == QDialog::Accepted)) {
 
         // Let the user chose the save path
         QSettings settings(QLatin1String{ "HDPS" }, QLatin1String{ "Plugins/" } +getKind());
         const QLatin1String directoryPathKey("directoryPath");
         const auto directoryPath = settings.value(directoryPathKey).toString() + "/";
         QString fileName = QFileDialog::getSaveFileName(
-            nullptr, tr("Save data set"), directoryPath + _dataSetName + ".bin", tr("Binary file (*.bin);;All Files (*)"));
+            nullptr, tr("Save data set"), directoryPath + getInputDatasetName() + ".bin", tr("Binary file (*.bin);;All Files (*)"));
 
         // Only continue when the dialog has not been not canceled and the file name is non-empty.
         if (fileName.isNull() || fileName.isEmpty())
@@ -66,7 +66,7 @@ void BinExporter::writeData()
             settings.setValue(directoryPathKey, QFileInfo(fileName).absolutePath());
 
             // get data from core
-            DataContent dataContent = retrieveDataSetContent(_dataSetName);
+            DataContent dataContent = retrieveDataSetContent(getInputDatasetName());
             writeVecToBinary(dataContent.dataVals, fileName);
             writeInfoTextForBinary(fileName, dataContent);
             qDebug() << "BinExporter: Data written to disk - File name: " << fileName;
@@ -78,12 +78,6 @@ void BinExporter::writeData()
         qDebug() << "BinExporter: No data written to disk - No data set selected";
         return;
     }
-}
-
-void BinExporter::dialogClosed(QString dataSetName, bool onlyIdices)
-{
-    _dataSetName = dataSetName;
-    _onlyIdices = onlyIdices;
 }
 
 DataContent BinExporter::retrieveDataSetContent(QString dataSetName) {

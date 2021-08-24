@@ -52,12 +52,10 @@ install(TARGETS ${PROJECT}
     ARCHIVE DESTINATION lib COMPONENT LINKLIB       # .lib .a
 )
 
-if (NOT $ENV{CI})
-    add_custom_command(TARGET ${PROJECT} POST_BUILD
-        DEPENDS BinExporter
-        COMMAND "${CMAKE_COMMAND}"
-            --install ${CMAKE_BINARY_DIR}
-            --config $<CONFIGURATION>
-            --prefix ${INSTALL_DIR}/$<CONFIGURATION>
-    )
-endif()
+add_custom_command(TARGET ${PROJECT} POST_BUILD
+    DEPENDS BinExporter
+    COMMAND "${CMAKE_COMMAND}"
+        --install ${CMAKE_BINARY_DIR}
+        --config $<CONFIGURATION>
+        --prefix ${INSTALL_DIR}/$<CONFIGURATION>
+)

@@ -40,18 +40,11 @@ class BinExporterDialog : public QDialog
 {
     Q_OBJECT
 public:
-    BinExporterDialog(QWidget* parent, std::vector<QString> dataSetNames) :
+    BinExporterDialog(QWidget* parent) :
         QDialog(parent), writeButton(tr("Write file"))
     {
         setWindowTitle(tr("Binary Exporter"));
 
-        for (QString& dataSetName : dataSetNames)
-            dataSetsBox.addItem(dataSetName);
-
-        if (dataSetNames.size() == 0)
-            dataSetsBox.setEnabled(false);
-
-        QLabel* dataSetsLabel = new QLabel("DataSets");
         QLabel* indicesLabel = new QLabel("Save only indices");
 
         writeButton.setDefault(true);
@@ -60,8 +53,6 @@ public:
         connect(this, &BinExporterDialog::closeDialog, this, &QDialog::accept);
 
         QHBoxLayout *layout = new QHBoxLayout();
-        layout->addWidget(dataSetsLabel);
-        layout->addWidget(&dataSetsBox);
         layout->addWidget(indicesLabel);
         layout->addWidget(&saveIndices);
         layout->addWidget(&writeButton);
@@ -69,17 +60,16 @@ public:
     }
 
 signals:
-    void closeDialog(QString dataSetName, bool onlyIndices);
+    void closeDialog(bool onlyIndices);
 
 public slots:
     // Pass selected data set name from BinExporterDialog to BinExporter (dialogClosed)
     void closeDialogAction() {
-        emit closeDialog(dataSetsBox.currentText(), saveIndices.isChecked());
+        emit closeDialog(saveIndices.isChecked());
     }
 
 private:
-    QComboBox dataSetsBox;
-    QCheckBox saveIndices;
+    QCheckBox       saveIndices;
     QPushButton writeButton;
 };
 
@@ -91,15 +81,12 @@ class BinExporter : public QObject, public WriterPlugin
 {
     Q_OBJECT
 public:
-    BinExporter(const PluginFactory* factory) : WriterPlugin(factory), _dataSetName("") { }
+    BinExporter(const PluginFactory* factory);
     ~BinExporter(void) override;
 
     void init() override;
 
     void writeData() Q_DECL_OVERRIDE;
-
-public slots:
-    void dialogClosed(QString dataSetName, bool onlyIdices);
 
 private:
     /*! Get data set contents from core
@@ -120,7 +107,6 @@ private:
 
     void writeInfoTextForBinary(QString writePath, DataContent& dataContent);
 
-    QString _dataSetName;
     bool _onlyIdices;
 
 };
