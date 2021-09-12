@@ -119,6 +119,11 @@ void BinLoader::dialogClosed(unsigned int numDimensions, BinaryDataType dataType
         qDebug() << "Derived from " << sourceName;
 }
 
+QIcon BinLoaderFactory::getIcon() const
+{
+    return Application::getIconFont("FontAwesome").getIcon("database");
+}
+
 // =============================================================================
 // Factory
 // =============================================================================

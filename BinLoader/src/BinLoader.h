@@ -148,6 +148,9 @@ public:
     BinLoaderFactory(void) {}
     ~BinLoaderFactory(void) override {}
 
+    /** Returns the plugin icon */
+    QIcon getIcon() const override;
+
     LoaderPlugin* produce() override;
 
     hdps::DataTypes supportedDataTypes() const override;

@@ -176,6 +176,11 @@ void BinExporter::writeInfoTextForBinary(QString writePath, DataContent& dataCon
     fout.close();
 }
 
+QIcon BinExporterFactory::getIcon() const
+{
+    return Application::getIconFont("FontAwesome").getIcon("database");
+}
+
 // =============================================================================
 // Factory
 // =============================================================================
