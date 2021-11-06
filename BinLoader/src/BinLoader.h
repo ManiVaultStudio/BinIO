@@ -114,7 +114,7 @@ class BinLoader : public QObject, public LoaderPlugin
 {
     Q_OBJECT
 public:
-    BinLoader() : LoaderPlugin("BIN Loader") { }
+    BinLoader(const PluginFactory* factory) : LoaderPlugin(factory) { }
     ~BinLoader(void) override;
 
     void init() override;
@@ -148,5 +148,10 @@ public:
     BinLoaderFactory(void) {}
     ~BinLoaderFactory(void) override {}
 
+    /** Returns the plugin icon */
+    QIcon getIcon() const override;
+
     LoaderPlugin* produce() override;
+
+    hdps::DataTypes supportedDataTypes() const override;
 };
