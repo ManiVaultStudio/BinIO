@@ -41,6 +41,7 @@ void BinLoader::loadData()
 
     qDebug() << "Loading BIN file: " << fileName;
 
+    // read in binary data
     std::vector<char> contents;
     std::ifstream in(fileName.toStdString(), std::ios::in | std::ios::binary);
     if (in)
@@ -56,16 +57,29 @@ void BinLoader::loadData()
         throw DataLoadException(fileName, "File was not found at location.");
     }
 
-    std::vector<float> data;
+    // Get unique identifier and gui names from all point data sets in the core
+    auto dataSets = _core->requestAllDataSets(QVector<hdps::DataType> {PointType});
 
-    std::vector<QString> dataSetNames = _core->requestAllDataNames(std::vector<hdps::DataType> {PointType});
+    QStringList dataset_guids;
+    QStringList dataset_gui_names;
 
-    BinLoadingInputDialog inputDialog(nullptr, QFileInfo(fileName).baseName(), dataSetNames);
+    for (auto& dataSet : dataSets)
+    {
+        dataset_gui_names.append(dataSet->getGuiName());
+        dataset_guids.append(dataSet->getGuid());
+    }
+
+    BinLoadingInputDialog inputDialog(nullptr, QFileInfo(fileName).baseName(), dataset_guids, dataset_gui_names);
     inputDialog.setModal(true);
+
+    // dialogClosed will set all necessary info for adding the data set to the core
     connect(&inputDialog, &BinLoadingInputDialog::closeDialog, this, &BinLoader::dialogClosed);
 
+    // open dialog and wait for user input
     int ok = inputDialog.exec();
 
+    // convert binary data to float vector
+    std::vector<float> data;
     if (ok == QDialog::Accepted) {
         if (_dataType == BinaryDataType::FLOAT)
         {
@@ -88,35 +102,38 @@ void BinLoader::loadData()
         }
     }
 
+    // add data to the core
     if (ok && !_dataSetName.isEmpty()) {
-        QString name;
-        if (_isDerived & (_sourceName != ""))
-            name = _core->createDerivedData(_dataSetName, _sourceName);
+
+        Dataset<Points> point_data;
+        if (_isDerived & (_parent_guid != ""))
+        {
+            auto parent_dataset = _core->requestDataset<Points>(_parent_guid);
+            point_data = _core->createDerivedData(_dataSetName, parent_dataset, parent_dataset);
+        }   
         else
-            name = _core->addData("Points", _dataSetName);
+            point_data = _core->addDataset("Points", _dataSetName);
 
-        Points& points = _core->requestData<Points>(name);
+        point_data->setData(data.data(), data.size() / _numDimensions, _numDimensions);
 
-        points.setData(data.data(), data.size() / _numDimensions, _numDimensions);
+        qDebug() << "Number of dimensions: " << point_data->getNumDimensions();
 
-        qDebug() << "Number of dimensions: " << points.getNumDimensions();
+        _core->notifyDataAdded(point_data);
 
-        _core->notifyDataAdded(name);
-
-        qDebug() << "BIN file loaded. Num data points: " << points.getNumPoints();
+        qDebug() << "BIN file loaded. Num data points: " << point_data->getNumPoints();
     }
 }
 
-void BinLoader::dialogClosed(unsigned int numDimensions, BinaryDataType dataType, QString dataSetName, bool isDerived, QString sourceName)
+void BinLoader::dialogClosed(unsigned int numDimensions, BinaryDataType dataType, QString dataSetName, bool isDerived, QString source_guid)
 {
     _numDimensions = numDimensions;
     _dataType = dataType;
     _dataSetName = dataSetName;
     _isDerived = isDerived;
-    _sourceName = sourceName;
+    _parent_guid = source_guid;
     qDebug() << _numDimensions << _dataType << _dataSetName;
     if (isDerived)
-        qDebug() << "Derived from " << sourceName;
+        qDebug() << "Derived from " << _core->requestDataset(_parent_guid)->getGuiName();
 }
 
 QIcon BinLoaderFactory::getIcon() const

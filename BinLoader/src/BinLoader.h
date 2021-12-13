@@ -27,8 +27,8 @@ class BinLoadingInputDialog : public QDialog
 {
     Q_OBJECT
 public:
-    BinLoadingInputDialog(QWidget* parent, QString fileName, std::vector<QString> dataSetNames) :
-        QDialog(parent)
+    BinLoadingInputDialog(QWidget* parent, QString fileName, QStringList dataSet_guids, QStringList dataSet_gui_names) :
+        QDialog(parent), _dataset_guids(dataSet_guids)
     {
         setWindowTitle(tr("Binary Loader"));
 
@@ -49,10 +49,14 @@ public:
         isDerived = new QCheckBox("Derived?");
         dataSetsLabel = new QLabel(tr("Data sets:"));
 
+        // Add gui names of data sets that can be derived from to combo box
         dataSetsBox = new QComboBox();
         dataSetsBox->addItem("");
-        for (QString& dataSetName : dataSetNames)
+        for (auto& dataSetName : dataSet_gui_names)
+        {
             dataSetsBox->addItem(dataSetName);
+        }
+
         dataSetsBox->setEnabled(false);
 
         loadButton = new QPushButton(tr("Load file"));
@@ -91,7 +95,11 @@ public slots:
         else if (dataTypeInput->currentText() == "Unsigned Byte")
             dataType = BinaryDataType::UBYTE;
 
-        emit closeDialog(numDimsInput->value(), dataType, dataNameInput->text(), isDerived->isChecked(), dataSetsBox->currentText());
+        // leave source name empty if data is not derived
+        if (isDerived->isChecked())
+            emit closeDialog(numDimsInput->value(), dataType, dataNameInput->text(), isDerived->isChecked(), _dataset_guids[dataSetsBox->currentIndex()-1]);
+        else
+            emit closeDialog(numDimsInput->value(), dataType, dataNameInput->text(), isDerived->isChecked(), "");
     }
 
 private:
@@ -102,6 +110,8 @@ private:
     QCheckBox* isDerived;
     QComboBox* dataSetsBox;
     QLabel* dataSetsLabel;
+
+    QStringList _dataset_guids;
 
     QPushButton* loadButton;
 };
@@ -129,7 +139,7 @@ private:
     BinaryDataType _dataType;
     QString _dataSetName;
     bool _isDerived;
-    QString _sourceName;
+    QString _parent_guid;
 };
 
 
