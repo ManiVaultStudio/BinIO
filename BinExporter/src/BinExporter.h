@@ -2,6 +2,8 @@
 
 #include <WriterPlugin.h>
 
+#include "PointData.h"
+
 #include <QDialog>
 #include <QCheckBox>
 #include <QHBoxLayout>
@@ -93,7 +95,7 @@ private:
      *
      * \param dataSetName Data set name to request from core
     */
-    DataContent retrieveDataSetContent(QString dataSetName);
+    DataContent retrieveDataSetContent(hdps::Dataset<Points> dataSet);
 
     /*! Write vector contents to disk
      * Stores content in little endian binary form.
