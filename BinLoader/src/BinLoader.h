@@ -1,5 +1,7 @@
 #pragma once
 
+#include <actions/DatasetPickerAction.h>
+
 #include <LoaderPlugin.h>
 
 #include <QDialog>
@@ -18,6 +20,8 @@ using namespace hdps::plugin;
 // Loading input box
 // =============================================================================
 
+class BinLoader;
+
 enum BinaryDataType
 {
     FLOAT, UBYTE
@@ -26,84 +30,56 @@ enum BinaryDataType
 class BinLoadingInputDialog : public QDialog
 {
     Q_OBJECT
+
 public:
-    BinLoadingInputDialog(QWidget* parent, QString fileName, std::vector<QString> dataSetNames) :
-        QDialog(parent)
-    {
-        setWindowTitle(tr("Binary Loader"));
+    BinLoadingInputDialog(QWidget* parent, BinLoader& binLoader, QString fileName);
 
-        dataNameInput = new QLineEdit();
-        dataNameInput->setText(fileName);
-
-        dataTypeInput = new QComboBox();
-        dataTypeInput->addItem("Float");
-        dataTypeInput->addItem("Unsigned Byte");
-
-        numDimsInput = new QSpinBox();
-        numDimsInput->setMinimum(1);
-        numDimsInput->setMaximum(INT_MAX);
-        numDimsInput->setValue(1);
-        numDimsLabel = new QLabel(tr("Number of dimensions:"));
-        numDimsLabel->setBuddy(numDimsInput);
-
-        isDerived = new QCheckBox("Derived?");
-        dataSetsLabel = new QLabel(tr("Data sets:"));
-
-        dataSetsBox = new QComboBox();
-        dataSetsBox->addItem("");
-        for (QString& dataSetName : dataSetNames)
-            dataSetsBox->addItem(dataSetName);
-        dataSetsBox->setEnabled(false);
-
-        loadButton = new QPushButton(tr("Load file"));
-        loadButton->setDefault(true);
-
-        connect(loadButton, &QPushButton::pressed, this, &BinLoadingInputDialog::closeDialogAction);
-        connect(this, &BinLoadingInputDialog::closeDialog, this, &QDialog::accept);
-        connect(isDerived, &QCheckBox::stateChanged, dataSetsBox, &QLabel::setEnabled);
-
-        QGridLayout *layout = new QGridLayout;
-        layout->addWidget(new QLabel(tr("Name:")), 0, 0);
-
-        layout->addWidget(dataNameInput, 0, 1);
-        layout->addWidget(numDimsLabel, 0, 2);
-        layout->addWidget(numDimsInput, 0, 3);
-        layout->addWidget(dataTypeInput, 0, 4);
-
-        layout->addWidget(isDerived, 1, 1);
-        layout->addWidget(dataSetsLabel, 1, 2);
-        layout->addWidget(dataSetsBox, 1, 3);
-
-        layout->addWidget(loadButton, 1, 5);
-
-        setLayout(layout);
+    /** Get preferred size */
+    QSize sizeHint() const override {
+        return QSize(400, 50);
     }
 
-signals:
-    void closeDialog(unsigned int numDimensions, BinaryDataType dataType, QString dataSetName, bool isDerived, QString sourceName);
-
-public slots:
-    void closeDialogAction()
-    {
-        BinaryDataType dataType;
-        if (dataTypeInput->currentText() == "Float")
-            dataType = BinaryDataType::FLOAT;
-        else if (dataTypeInput->currentText() == "Unsigned Byte")
-            dataType = BinaryDataType::UBYTE;
-
-        emit closeDialog(numDimsInput->value(), dataType, dataNameInput->text(), isDerived->isChecked(), dataSetsBox->currentText());
+    /** Get minimum size hint*/
+    QSize minimumSizeHint() const override {
+        return sizeHint();
     }
 
-private:
-    QLineEdit* dataNameInput;
-    QComboBox* dataTypeInput;
-    QLabel* numDimsLabel;
-    QSpinBox* numDimsInput;
-    QCheckBox* isDerived;
-    QComboBox* dataSetsBox;
-    QLabel* dataSetsLabel;
+    /** Get the GUI name of the loaded dataset */
+    QString getDatasetName() const {
+        return _datasetNameAction.getString();
+    }
 
-    QPushButton* loadButton;
+    /** Get the binary data type */
+    BinaryDataType getDataType() const {
+        if (_dataTypeAction.getCurrentText() == "Float")
+            return BinaryDataType::FLOAT;
+        else if (_dataTypeAction.getCurrentText() == "Unsigned Byte")
+            return BinaryDataType::UBYTE;
+    }
+
+    /** Get the number of dimensions */
+    std::int32_t getNumberOfDimensions() const {
+        return _numberOfDimensionsAction.getValue();
+    }
+
+    /** Get whether the dataset will be marked as derived */
+    bool getIsDerived() const {
+        return _isDerivedAction.isChecked();
+    }
+
+    /** Get smart pointer to dataset (if any) */
+    hdps::Dataset<hdps::DatasetImpl> getSourceDataset() {
+        return _datasetPickerAction.getCurrentDataset();
+    }
+
+protected:
+    StringAction            _datasetNameAction;             /** Dataset name action */
+    OptionAction            _dataTypeAction;                /** Data type action */
+    IntegralAction          _numberOfDimensionsAction;      /** Number of dimensions action */
+    ToggleAction            _isDerivedAction;               /** Mark dataset as derived action */
+    DatasetPickerAction     _datasetPickerAction;           /** Dataset picker action for picking source datasets */
+    TriggerAction           _loadAction;                    /** Load action */
+    GroupAction             _groupAction;                   /** Group action */
 };
 
 // =============================================================================
@@ -120,16 +96,6 @@ public:
     void init() override;
 
     void loadData() Q_DECL_OVERRIDE;
-
-public slots:
-    void dialogClosed(unsigned int numDimensions, BinaryDataType dataType, QString dataSetName, bool isDerived, QString sourceName);
-
-private:
-    unsigned int _numDimensions;
-    BinaryDataType _dataType;
-    QString _dataSetName;
-    bool _isDerived;
-    QString _sourceName;
 };
 
 

@@ -1,6 +1,5 @@
 #include "BinExporter.h"
 
-#include "PointData.h"
 #include "Set.h"
 
 #include <QtCore>
@@ -51,8 +50,9 @@ void BinExporter::writeData()
         QSettings settings(QLatin1String{ "HDPS" }, QLatin1String{ "Plugins/" } +getKind());
         const QLatin1String directoryPathKey("directoryPath");
         const auto directoryPath = settings.value(directoryPathKey).toString() + "/";
+        auto& inputDataset = _input;        // why does getInputDataset<Points>() throw an error? 
         QString fileName = QFileDialog::getSaveFileName(
-            nullptr, tr("Save data set"), directoryPath + getInputDatasetName() + ".bin", tr("Binary file (*.bin);;All Files (*)"));
+            nullptr, tr("Save data set"), directoryPath + inputDataset->getGuiName() + ".bin", tr("Binary file (*.bin);;All Files (*)"));
 
         // Only continue when the dialog has not been not canceled and the file name is non-empty.
         if (fileName.isNull() || fileName.isEmpty())
@@ -66,7 +66,8 @@ void BinExporter::writeData()
             settings.setValue(directoryPathKey, QFileInfo(fileName).absolutePath());
 
             // get data from core
-            DataContent dataContent = retrieveDataSetContent(getInputDatasetName());
+            auto& inputDataset = _input;        // why does getInputDataset<Points>() throw an error? 
+            DataContent dataContent = retrieveDataSetContent(inputDataset);
             writeVecToBinary(dataContent.dataVals, fileName);
             writeInfoTextForBinary(fileName, dataContent);
             qDebug() << "BinExporter: Data written to disk - File name: " << fileName;
@@ -80,27 +81,25 @@ void BinExporter::writeData()
     }
 }
 
-DataContent BinExporter::retrieveDataSetContent(QString dataSetName) {
+DataContent BinExporter::retrieveDataSetContent(hdps::Dataset<Points> dataSet) {
     DataContent dataContent;
-
-    Points& points = _core->requestData<Points>(dataSetName);
     std::vector<float> dataFromSet;
 
     // Get number of enabled dimensions
-    unsigned int numDimensions = points.getNumDimensions();
+    unsigned int numDimensions = dataSet->getNumDimensions();
 
     if (_onlyIdices)
     {
-        std::transform(points.indices.begin(), points.indices.end(), std::back_inserter(dataFromSet), [](int x) { return (float)x; });
+        std::transform(dataSet->indices.begin(), dataSet->indices.end(), std::back_inserter(dataFromSet), [](int x) { return (float)x; });
         dataContent.onlyIndices = true;
     }
     else
     {
         // Get indices of selected points
-        std::vector<unsigned int> pointIDsGlobal = points.indices;
+        std::vector<unsigned int> pointIDsGlobal = dataSet->indices;
         // If points represent all data set, select them all
-        if (points.isFull()) {
-            std::vector<unsigned int> all(points.getNumPoints());
+        if (dataSet->isFull()) {
+            std::vector<unsigned int> all(dataSet->getNumPoints());
             std::iota(std::begin(all), std::end(all), 0);
 
             pointIDsGlobal = all;
@@ -109,7 +108,7 @@ DataContent BinExporter::retrieveDataSetContent(QString dataSetName) {
         // For all selected points, retrieve values from each dimension
         dataFromSet.reserve(pointIDsGlobal.size() * numDimensions);
 
-        points.visitFromBeginToEnd([&dataFromSet, &pointIDsGlobal, &numDimensions](auto beginOfData, auto endOfData)
+        dataSet->visitFromBeginToEnd([&dataFromSet, &pointIDsGlobal, &numDimensions](auto beginOfData, auto endOfData)
         {
             for (const auto& pointId : pointIDsGlobal)
             {
@@ -125,17 +124,17 @@ DataContent BinExporter::retrieveDataSetContent(QString dataSetName) {
     // Data content for writing to disk
     dataContent.dataVals = dataFromSet;
     dataContent.numDimensions = numDimensions;
-    dataContent.numPoints = points.getNumPoints();
+    dataContent.numPoints = dataSet->getNumPoints();
 
-    if (points.isDerivedData())
+    if (dataSet->isDerivedData())
     {
         dataContent.isDerived = true;
 
-        Points& sourceData = points.getSourceData<Points>(points);
+        auto sourceData = dataSet->getSourceDataset<Points>();
 
-        dataContent.derivedFrom = sourceData.getName();
-        dataContent.sourceNumDimensions = sourceData.getNumDimensions();
-        dataContent.sourceNumPoints = sourceData.getNumPoints();
+        dataContent.derivedFrom = sourceData->getGuiName();
+        dataContent.sourceNumDimensions = sourceData->getNumDimensions();
+        dataContent.sourceNumPoints = sourceData->getNumPoints();
     }
 
     return dataContent;
