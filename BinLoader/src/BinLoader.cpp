@@ -134,7 +134,7 @@ DataTypes BinLoaderFactory::supportedDataTypes() const
 BinLoadingInputDialog::BinLoadingInputDialog(QWidget* parent, BinLoader& binLoader, QString fileName) :
     QDialog(parent),
     _datasetNameAction(this, "Dataset name", fileName),
-    _dataTypeAction(this, "Data type", { "Float", "Unsigned byte" }),
+    _dataTypeAction(this, "Data type", { "Float", "Unsigned Byte" }),
     _numberOfDimensionsAction(this, "Number of dimensions", 1, 1000000, 1, 1),
     _isDerivedAction(this, "Mark as derived", false, false),
     _datasetPickerAction(this, "Source dataset"),
