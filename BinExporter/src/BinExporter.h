@@ -79,7 +79,7 @@ private:
 // View
 // =============================================================================
 
-class BinExporter : public QObject, public WriterPlugin
+class BinExporter : public WriterPlugin
 {
     Q_OBJECT
 public:

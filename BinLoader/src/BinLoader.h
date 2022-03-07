@@ -86,7 +86,7 @@ protected:
 // View
 // =============================================================================
 
-class BinLoader : public QObject, public LoaderPlugin
+class BinLoader : public LoaderPlugin
 {
     Q_OBJECT
 public:

@@ -143,13 +143,6 @@ BinLoadingInputDialog::BinLoadingInputDialog(QWidget* parent, BinLoader& binLoad
 {
     setWindowTitle(tr("Binary Loader"));
 
-    _datasetNameAction.setMayReset(false);
-    _dataTypeAction.setMayReset(false);
-    _numberOfDimensionsAction.setMayReset(false);
-    _isDerivedAction.setMayReset(false);
-    _datasetPickerAction.setMayReset(false);
-    _loadAction.setMayReset(false);
-
     _numberOfDimensionsAction.setDefaultWidgetFlags(IntegralAction::WidgetFlag::SpinBox);
 
     // Load some settings
