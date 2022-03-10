@@ -96,7 +96,7 @@ void BinLoader::loadData()
         auto sourceDataset = inputDialog.getSourceDataset();
 
         if (sourceDataset.isValid())
-            point_data = _core->createDerivedData(inputDialog.getDatasetName(), sourceDataset);
+            point_data = _core->createDerivedDataset(inputDialog.getDatasetName(), sourceDataset);
         else
             point_data = _core->addDataset("Points", inputDialog.getDatasetName());
 
@@ -104,7 +104,7 @@ void BinLoader::loadData()
 
         qDebug() << "Number of dimensions: " << point_data->getNumDimensions();
 
-        _core->notifyDataAdded(point_data);
+        _core->notifyDatasetAdded(point_data);
 
         qDebug() << "BIN file loaded. Num data points: " << point_data->getNumPoints();
     }
