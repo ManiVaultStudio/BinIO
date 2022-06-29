@@ -47,9 +47,9 @@ target_link_libraries(${PROJECT} "${HDPS_LINK_LIBRARY}")
 target_link_libraries(${PROJECT} "${POINTDATA_LINK_LIBRARY}")
 
 install(TARGETS ${PROJECT}
-    RUNTIME DESTINATION Plugins COMPONENT SHAREDLIB # .dll
-    LIBRARY DESTINATION Plugins COMPONENT LINKLIB   # .so .dylib
-    ARCHIVE DESTINATION lib COMPONENT LINKLIB       # .lib .a
+   RUNTIME DESTINATION Plugins COMPONENT SHAREDLIB
+   LIBRARY DESTINATION Plugins COMPONENT LINKLIB
+   ARCHIVE DESTINATION lib COMPONENT LINKLIB
 )
 
 add_custom_command(TARGET ${PROJECT} POST_BUILD
@@ -57,7 +57,7 @@ add_custom_command(TARGET ${PROJECT} POST_BUILD
     COMMAND "${CMAKE_COMMAND}"
         --install ${CMAKE_CURRENT_BINARY_DIR}
         --config $<CONFIGURATION>
-        --prefix "${INSTALL_DIR}/$<CONFIGURATION>"
+        --prefix ${INSTALL_DIR}/$<CONFIGURATION>
 )
 
 # Automatically set the debug environment (command + working directory) for MSVC in debug mode
