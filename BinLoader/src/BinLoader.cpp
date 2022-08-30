@@ -110,7 +110,7 @@ void BinLoader::loadData()
     }
 }
 
-QIcon BinLoaderFactory::getIcon() const
+QIcon BinLoaderFactory::getIcon(const QColor& color /*= Qt::black*/) const
 {
     return Application::getIconFont("FontAwesome").getIcon("database");
 }

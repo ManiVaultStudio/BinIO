@@ -175,9 +175,9 @@ void BinExporter::writeInfoTextForBinary(QString writePath, DataContent& dataCon
     fout.close();
 }
 
-QIcon BinExporterFactory::getIcon() const
+QIcon BinExporterFactory::getIcon(const QColor& color /*= Qt::black*/) const
 {
-    return Application::getIconFont("FontAwesome").getIcon("database");
+    return Application::getIconFont("FontAwesome").getIcon("database", color);
 }
 
 // =============================================================================
