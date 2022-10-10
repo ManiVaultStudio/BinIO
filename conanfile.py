@@ -9,7 +9,7 @@ from rules_support import PluginBranchInfo
 
 
 class BinIOPluginConan(ConanFile):
-    """Class to package ImageLoaderPlugin using conan
+    """Class to package BinIOPlugin using conan
 
     Packages both RELEASE and DEBUG.
     Uses rules_support (github.com/hdps/rulessupport) to derive
@@ -20,8 +20,8 @@ class BinIOPluginConan(ConanFile):
     name = "BinIOPlugin"
     description = """Plugins for reading and writing binary data
                   in the high-dimensional plugin system (HDPS)."""
-    topics = ("hdps", "plugin", "image data", "loading")
-    url = "https://github.com/hdps/ImageLoaderPlugin"
+    topics = ("hdps", "plugin", "binary data", "loading", "writing")
+    url = "https://github.com/hdps/BinIOPlugin"
     author = "B. van Lew b.van_lew@lumc.nl"  # conan recipe author
     license = "MIT"
 
