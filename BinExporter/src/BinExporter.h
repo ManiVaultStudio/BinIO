@@ -139,4 +139,11 @@ public:
     WriterPlugin* produce() override;
 
     hdps::DataTypes supportedDataTypes() const override;
+
+    /**
+     * Get plugin trigger actions given \p datasets
+     * @param datasets Vector of input datasets
+     * @return Vector of plugin trigger actions
+     */
+    PluginTriggerActions getPluginTriggerActions(const hdps::Datasets& datasets) const override;
 };

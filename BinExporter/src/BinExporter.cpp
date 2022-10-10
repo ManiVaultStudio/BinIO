@@ -1,5 +1,7 @@
 #include "BinExporter.h"
 
+#include <actions/PluginTriggerAction.h>
+
 #include "Set.h"
 
 #include <QtCore>
@@ -175,11 +177,6 @@ void BinExporter::writeInfoTextForBinary(QString writePath, DataContent& dataCon
     fout.close();
 }
 
-QIcon BinExporterFactory::getIcon(const QColor& color /*= Qt::black*/) const
-{
-    return Application::getIconFont("FontAwesome").getIcon("database", color);
-}
-
 // =============================================================================
 // Factory
 // =============================================================================
@@ -189,9 +186,38 @@ WriterPlugin* BinExporterFactory::produce()
     return new BinExporter(this);
 }
 
+QIcon BinExporterFactory::getIcon(const QColor& color /*= Qt::black*/) const
+{
+    return Application::getIconFont("FontAwesome").getIcon("database", color);
+}
+
 DataTypes BinExporterFactory::supportedDataTypes() const
 {
     DataTypes supportedTypes;
     supportedTypes.append(PointType);
     return supportedTypes;
+}
+
+PluginTriggerActions BinExporterFactory::getPluginTriggerActions(const hdps::Datasets& datasets) const
+{
+    PluginTriggerActions pluginTriggerActions;
+
+    const auto getPluginInstance = [this](const Dataset<Points>& dataset) -> BinExporter* {
+        return dynamic_cast<BinExporter*>(Application::core()->requestPlugin(getKind(), { dataset }));
+    };
+
+    if (PluginFactory::areAllDatasetsOfTheSameType(datasets, PointType)) {
+        if (datasets.count() >= 1) {
+            auto pluginTriggerAction = createPluginTriggerAction("BinExporter", "Export dataset to binary file", datasets);
+
+            connect(pluginTriggerAction, &QAction::triggered, [this, getPluginInstance, datasets]() -> void {
+                for (auto dataset : datasets)
+                    getPluginInstance(dataset);
+                });
+
+            pluginTriggerActions << pluginTriggerAction;
+        }
+    }
+
+    return pluginTriggerActions;
 }
