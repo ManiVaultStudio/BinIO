@@ -53,8 +53,8 @@ public:
     BinaryDataType getDataType() const {
         if (_dataTypeAction.getCurrentText() == "Float")
             return BinaryDataType::FLOAT;
-        else if (_dataTypeAction.getCurrentText() == "Unsigned Byte")
-            return BinaryDataType::UBYTE;
+        // else if (_dataTypeAction.getCurrentText() == "Unsigned Byte")
+        return BinaryDataType::UBYTE;
     }
 
     /** Get the number of dimensions */
