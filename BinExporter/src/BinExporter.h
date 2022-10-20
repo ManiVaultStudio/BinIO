@@ -15,6 +15,7 @@
 #include <QCheckBox> 
 
 using namespace hdps::plugin;
+using namespace hdps::gui;
 
 struct DataContent {
     DataContent() : dataVals{}, numDimensions(0), numPoints(0), isDerived(false), onlyIndices(false), derivedFrom(""), sourceNumDimensions(0), sourceNumPoints(0) {};
