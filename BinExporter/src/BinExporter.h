@@ -25,6 +25,7 @@ struct DataContent {
 
     bool isDerived;
     bool onlyIndices;
+    bool onlySelection;
     QString derivedFrom;
     unsigned int sourceNumDimensions;
     unsigned int sourceNumPoints;
@@ -49,6 +50,7 @@ public:
         setWindowTitle(tr("Binary Exporter"));
 
         QLabel* indicesLabel = new QLabel("Save only indices");
+        QLabel* selectionLabel = new QLabel("Save only selection");
 
         writeButton.setDefault(true);
 
@@ -58,21 +60,24 @@ public:
         QHBoxLayout *layout = new QHBoxLayout();
         layout->addWidget(indicesLabel);
         layout->addWidget(&saveIndices);
+        layout->addWidget(selectionLabel);
+        layout->addWidget(&saveSelectionOnly);
         layout->addWidget(&writeButton);
         setLayout(layout);
     }
 
 signals:
-    void closeDialog(bool onlyIndices);
+    void closeDialog(bool onlyIndices, bool onlySelection);
 
 public slots:
     // Pass selected data set name from BinExporterDialog to BinExporter (dialogClosed)
     void closeDialogAction() {
-        emit closeDialog(saveIndices.isChecked());
+        emit closeDialog(saveIndices.isChecked(), saveSelectionOnly.isChecked());
     }
 
 private:
     QCheckBox       saveIndices;
+    QCheckBox       saveSelectionOnly;
     QPushButton writeButton;
 };
 
@@ -106,11 +111,12 @@ private:
      * \param writePath Target path
     */
     template<typename T>
-    void writeVecToBinary(std::vector<T> vec, QString writePath);
+    void writeVecToBinary(std::vector<T>& vec, QString writePath);
 
     void writeInfoTextForBinary(QString writePath, DataContent& dataContent);
 
     bool _onlyIdices;
+    bool _onlySelection;
 
 };
 

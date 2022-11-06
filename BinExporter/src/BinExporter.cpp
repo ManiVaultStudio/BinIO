@@ -21,7 +21,10 @@ Q_PLUGIN_METADATA(IID "nl.tudelft.BinExporter")
 using namespace hdps;
 
 BinExporter::BinExporter(const PluginFactory* factory) :
-    WriterPlugin(factory)
+    WriterPlugin(factory),
+    _onlyIdices(false),
+    _onlySelection(false)
+
 {
 }
 
@@ -40,8 +43,9 @@ void BinExporter::writeData()
     
     inputDialog.setModal(true);
 
-    connect(&inputDialog, &BinExporterDialog::closeDialog, this, [this](bool onlyIdices) {
+    connect(&inputDialog, &BinExporterDialog::closeDialog, this, [this](bool onlyIdices, bool onlySelection) {
         _onlyIdices = onlyIdices;
+        _onlySelection = onlySelection;
     });
 
     int ok = inputDialog.exec();
@@ -52,9 +56,8 @@ void BinExporter::writeData()
         QSettings settings(QLatin1String{ "HDPS" }, QLatin1String{ "Plugins/" } +getKind());
         const QLatin1String directoryPathKey("directoryPath");
         const auto directoryPath = settings.value(directoryPathKey).toString() + "/";
-        auto& inputDataset = _input;        // why does getInputDataset<Points>() throw an error? 
-        QString fileName = QFileDialog::getSaveFileName(
-            nullptr, tr("Save data set"), directoryPath + inputDataset->getGuiName() + ".bin", tr("Binary file (*.bin);;All Files (*)"));
+
+        QString fileName = QFileDialog::getSaveFileName(nullptr, tr("Save data set"), directoryPath + _input->getGuiName() + ".bin", tr("Binary file (*.bin);;All Files (*)"));
 
         // Only continue when the dialog has not been not canceled and the file name is non-empty.
         if (fileName.isNull() || fileName.isEmpty())
@@ -85,27 +88,29 @@ void BinExporter::writeData()
 
 DataContent BinExporter::retrieveDataSetContent(hdps::Dataset<Points> dataSet) {
     DataContent dataContent;
-    std::vector<float> dataFromSet;
+    std::vector<float>& dataFromSet = dataContent.dataVals;
 
     // Get number of enabled dimensions
     unsigned int numDimensions = dataSet->getNumDimensions();
 
     if (_onlyIdices)
     {
-        std::transform(dataSet->indices.begin(), dataSet->indices.end(), std::back_inserter(dataFromSet), [](int x) { return (float)x; });
+        std::vector<uint32_t>&selectionIDs = dataSet->indices;
+        
+        if (_onlySelection)
+            selectionIDs = dataSet->getSelectionIndices();
+        
+        std::transform(selectionIDs.begin(), selectionIDs.end(), std::back_inserter(dataFromSet), [](uint32_t x) { return static_cast<float>(x); });
+
         dataContent.onlyIndices = true;
     }
     else
     {
         // Get indices of selected points
         std::vector<unsigned int> pointIDsGlobal = dataSet->indices;
-        // If points represent all data set, select them all
-        if (dataSet->isFull()) {
-            std::vector<unsigned int> all(dataSet->getNumPoints());
-            std::iota(std::begin(all), std::end(all), 0);
 
-            pointIDsGlobal = all;
-        }
+        if (_onlySelection)
+            pointIDsGlobal = dataSet->getSelectionIndices();
 
         // For all selected points, retrieve values from each dimension
         dataFromSet.reserve(pointIDsGlobal.size() * numDimensions);
@@ -123,10 +128,11 @@ DataContent BinExporter::retrieveDataSetContent(hdps::Dataset<Points> dataSet) {
         });
     }
 
-    // Data content for writing to disk
+    // Meta data
     dataContent.dataVals = dataFromSet;
     dataContent.numDimensions = numDimensions;
     dataContent.numPoints = dataSet->getNumPoints();
+    dataContent.onlySelection = _onlySelection;
 
     if (dataSet->isDerivedData())
     {
@@ -143,7 +149,7 @@ DataContent BinExporter::retrieveDataSetContent(hdps::Dataset<Points> dataSet) {
 }
 
 template<typename T>
-void BinExporter::writeVecToBinary(std::vector<T> vec, QString writePath) {
+void BinExporter::writeVecToBinary(std::vector<T>& vec, QString writePath) {
     std::ofstream fout(writePath.toStdString(), std::ofstream::out | std::ofstream::binary);
     fout.write(reinterpret_cast<const char*>(vec.data()), vec.size() * sizeof(T));
     fout.close();
@@ -171,6 +177,12 @@ void BinExporter::writeInfoTextForBinary(QString writePath, DataContent& dataCon
     {
         infoText += "Contains only indices (e.g. of a selection) \n";
     }
+
+    if (dataContent.onlySelection)
+    {
+        infoText += "Contains only values for selected indices \n";
+    }
+
 
     std::ofstream fout(writePath.section(".", 0, 0).toStdString() + ".txt");
     fout << infoText;
