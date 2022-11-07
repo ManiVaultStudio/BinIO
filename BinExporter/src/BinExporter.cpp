@@ -181,6 +181,7 @@ void BinExporter::writeInfoTextForBinary(QString writePath, DataContent& dataCon
     if (dataContent.onlySelection)
     {
         infoText += "Contains only values for selected indices \n";
+        infoText += "Num data points (selection) : " + std::to_string(dataContent.dataVals.size()) + "\n";
     }
 
 
