@@ -19,6 +19,7 @@
 Q_PLUGIN_METADATA(IID "nl.tudelft.BinExporter")
 
 using namespace hdps;
+using namespace hdps::gui;
 
 BinExporter::BinExporter(const PluginFactory* factory) :
     WriterPlugin(factory)
@@ -203,17 +204,15 @@ PluginTriggerActions BinExporterFactory::getPluginTriggerActions(const hdps::Dat
     PluginTriggerActions pluginTriggerActions;
 
     const auto getPluginInstance = [this](const Dataset<Points>& dataset) -> BinExporter* {
-        return dynamic_cast<BinExporter*>(Application::core()->requestPlugin(getKind(), { dataset }));
+        return dynamic_cast<BinExporter*>(plugins().requestPlugin(getKind(), { dataset }));
     };
 
     if (PluginFactory::areAllDatasetsOfTheSameType(datasets, PointType)) {
         if (datasets.count() >= 1) {
-            auto pluginTriggerAction = createPluginTriggerAction("BinExporter", "Export dataset to binary file", datasets);
-
-            connect(pluginTriggerAction, &QAction::triggered, [this, getPluginInstance, datasets]() -> void {
+            auto pluginTriggerAction = new PluginTriggerAction(const_cast<BinExporterFactory*>(this), this, "BinExporter", "Export dataset to binary file", getIcon(), [this, getPluginInstance, datasets](PluginTriggerAction& pluginTriggerAction) -> void {
                 for (auto dataset : datasets)
                     getPluginInstance(dataset);
-                });
+            });
 
             pluginTriggerActions << pluginTriggerAction;
         }

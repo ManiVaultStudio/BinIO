@@ -100,10 +100,10 @@ void BinLoader::loadData()
         else
             point_data = _core->addDataset<Points>("Points", inputDialog.getDatasetName());
 
-        _core->notifyDatasetAdded(point_data);
+        events().notifyDatasetAdded(point_data);
 
         point_data->setData(data.data(), data.size() / inputDialog.getNumberOfDimensions(), inputDialog.getNumberOfDimensions());
-        _core->notifyDatasetChanged(point_data);
+        events().notifyDatasetChanged(point_data);
 
         qDebug() << "Number of dimensions: " << point_data->getNumDimensions();
         qDebug() << "BIN file loaded. Num data points: " << point_data->getNumPoints();
