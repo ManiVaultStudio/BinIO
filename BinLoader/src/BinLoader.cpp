@@ -17,6 +17,7 @@
 Q_PLUGIN_METADATA(IID "nl.tudelft.BinLoader")
 
 using namespace hdps;
+using namespace hdps::gui;
 
 // =============================================================================
 // View
