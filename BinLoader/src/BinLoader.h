@@ -73,13 +73,13 @@ public:
     }
 
 protected:
-    StringAction            _datasetNameAction;             /** Dataset name action */
-    OptionAction            _dataTypeAction;                /** Data type action */
-    IntegralAction          _numberOfDimensionsAction;      /** Number of dimensions action */
-    ToggleAction            _isDerivedAction;               /** Mark dataset as derived action */
-    DatasetPickerAction     _datasetPickerAction;           /** Dataset picker action for picking source datasets */
-    TriggerAction           _loadAction;                    /** Load action */
-    GroupAction             _groupAction;                   /** Group action */
+    hdps::gui::StringAction            _datasetNameAction;             /** Dataset name action */
+    hdps::gui::OptionAction            _dataTypeAction;                /** Data type action */
+    hdps::gui::IntegralAction          _numberOfDimensionsAction;      /** Number of dimensions action */
+    hdps::gui::ToggleAction            _isDerivedAction;               /** Mark dataset as derived action */
+    hdps::gui::DatasetPickerAction     _datasetPickerAction;           /** Dataset picker action for picking source datasets */
+    hdps::gui::TriggerAction           _loadAction;                    /** Load action */
+    hdps::gui::GroupAction             _groupAction;                   /** Group action */
 };
 
 // =============================================================================
