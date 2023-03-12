@@ -140,7 +140,7 @@ BinLoadingInputDialog::BinLoadingInputDialog(QWidget* parent, BinLoader& binLoad
     _isDerivedAction(this, "Mark as derived", false, false),
     _datasetPickerAction(this, "Source dataset"),
     _loadAction(this, "Load"),
-    _groupAction(this)
+    _groupAction(this, "Settings")
 {
     setWindowTitle(tr("Binary Loader"));
 
