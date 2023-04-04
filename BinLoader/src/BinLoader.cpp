@@ -1,6 +1,6 @@
 #include "BinLoader.h"
 
-#include <PointData.h>
+#include <PointData/PointData.h>
 
 #include "Set.h"
 
