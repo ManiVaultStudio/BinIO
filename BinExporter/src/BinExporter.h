@@ -2,7 +2,7 @@
 
 #include <WriterPlugin.h>
 
-#include "PointData.h"
+#include "PointData/PointData.h"
 
 #include <QDialog>
 #include <QCheckBox>
