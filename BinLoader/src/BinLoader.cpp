@@ -150,12 +150,12 @@ BinLoadingInputDialog::BinLoadingInputDialog(QWidget* parent, BinLoader& binLoad
     _dataTypeAction.setCurrentIndex(binLoader.getSetting("DataType").toInt());
     _numberOfDimensionsAction.setValue(binLoader.getSetting("NumberOfDimensions").toInt());
 
-    _groupAction << _datasetNameAction;
-    _groupAction << _dataTypeAction;
-    _groupAction << _numberOfDimensionsAction;
-    _groupAction << _isDerivedAction;
-    _groupAction << _datasetPickerAction;
-    _groupAction << _loadAction;
+    _groupAction.addAction(&_datasetNameAction);
+    _groupAction.addAction(&_dataTypeAction);
+    _groupAction.addAction(&_numberOfDimensionsAction);
+    _groupAction.addAction(&_isDerivedAction);
+    _groupAction.addAction(&_datasetPickerAction);
+    _groupAction.addAction(&_loadAction);
 
     auto layout = new QVBoxLayout();
 
