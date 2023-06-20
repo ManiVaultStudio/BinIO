@@ -136,8 +136,8 @@ BinLoadingInputDialog::BinLoadingInputDialog(QWidget* parent, BinLoader& binLoad
     QDialog(parent),
     _datasetNameAction(this, "Dataset name", fileName),
     _dataTypeAction(this, "Data type", { "Float", "Unsigned Byte" }),
-    _numberOfDimensionsAction(this, "Number of dimensions", 1, 1000000, 1, 1),
-    _isDerivedAction(this, "Mark as derived", false, false),
+    _numberOfDimensionsAction(this, "Number of dimensions", 1, 1000000, 1),
+    _isDerivedAction(this, "Mark as derived", false),
     _datasetPickerAction(this, "Source dataset"),
     _loadAction(this, "Load"),
     _groupAction(this, "Settings")
