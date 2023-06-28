@@ -51,15 +51,20 @@ public:
 
     /** Get the binary data type */
     BinaryDataType getDataType() const {
-        if (_dataTypeAction.getCurrentText() == "Float")
+        if (_dataTypeAction.getCurrentIndex() == 0) // Float32
             return BinaryDataType::FLOAT;
-        // else if (_dataTypeAction.getCurrentText() == "Unsigned Byte")
+        // else if (_dataTypeAction.getCurrentIndex() == 1) // Unsigned Byte (Uint8)
         return BinaryDataType::UBYTE;
     }
 
     /** Get the number of dimensions */
     std::int32_t getNumberOfDimensions() const {
         return _numberOfDimensionsAction.getValue();
+    }
+
+    /** Get the desired storage type */
+    QString getStoreAs() const {
+        return _storeAsAction.getCurrentText();
     }
 
     /** Get whether the dataset will be marked as derived */
@@ -76,6 +81,7 @@ protected:
     hdps::gui::StringAction            _datasetNameAction;             /** Dataset name action */
     hdps::gui::OptionAction            _dataTypeAction;                /** Data type action */
     hdps::gui::IntegralAction          _numberOfDimensionsAction;      /** Number of dimensions action */
+    hdps::gui::OptionAction            _storeAsAction;                 /** Store as action */
     hdps::gui::ToggleAction            _isDerivedAction;               /** Mark dataset as derived action */
     hdps::gui::DatasetPickerAction     _datasetPickerAction;           /** Dataset picker action for picking source datasets */
     hdps::gui::TriggerAction           _loadAction;                    /** Load action */

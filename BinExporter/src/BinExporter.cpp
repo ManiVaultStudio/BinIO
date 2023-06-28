@@ -22,7 +22,8 @@ using namespace hdps;
 using namespace hdps::gui;
 
 BinExporter::BinExporter(const PluginFactory* factory) :
-    WriterPlugin(factory)
+    WriterPlugin(factory),
+    _onlyIdices(false)
 {
 }
 
@@ -91,7 +92,7 @@ DataContent BinExporter::retrieveDataSetContent(hdps::Dataset<Points> dataSet) {
     // Get number of enabled dimensions
     unsigned int numDimensions = dataSet->getNumDimensions();
 
-    if (_onlyIdices)
+    if (_onlyIdices) // Instead of saving the data values, you might want to save the IDs of a selection
     {
         std::transform(dataSet->indices.begin(), dataSet->indices.end(), std::back_inserter(dataFromSet), [](int x) { return (float)x; });
         dataContent.onlyIndices = true;

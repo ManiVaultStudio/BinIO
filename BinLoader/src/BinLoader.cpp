@@ -13,6 +13,7 @@
 #include <fstream>
 #include <iterator>
 #include <vector>
+#include <type_traits>
 
 Q_PLUGIN_METADATA(IID "nl.tudelft.BinLoader")
 
@@ -30,6 +31,79 @@ BinLoader::~BinLoader(void)
 
 void BinLoader::init()
 {
+
+}
+
+namespace {
+
+
+template <typename T, typename S>
+void readDataAndAddToCore(hdps::Dataset<Points>& point_data, int32_t numDims, const std::vector<char>& contents)
+{
+
+    // convert binary data to float vector
+    std::vector<S> data;
+    auto add_to_data = [&data](auto val) ->void {
+        auto c = static_cast<S>(val);
+        data.push_back(c);
+    };
+
+    if constexpr (std::is_same_v<T, float>) {
+        for (int i = 0; i < contents.size() / 4; i++)
+        {
+            float f = ((float*)contents.data())[i];
+            add_to_data(f);
+        }
+    }
+    else if constexpr (std::is_same_v<T, unsigned char>)
+    {
+        for (int i = 0; i < contents.size(); i++)
+        {
+            T c = static_cast<T>(contents[i]);
+            add_to_data(c);
+        }
+    }
+    else
+    {
+        qWarning() << "BinLoader.cpp::readDataAndAddToCore: No data loaded. Template typename not implemented.";
+    }
+
+    // add data to the core
+    point_data->setData(std::move(data), numDims);
+    events().notifyDatasetChanged(point_data);
+
+    qDebug() << "Number of dimensions: " << point_data->getNumDimensions();
+    qDebug() << "BIN file loaded. Num data points: " << point_data->getNumPoints();
+
+}
+
+// Recursively searches for the data element type that is specified by the selectedDataElementType parameter. 
+template <typename T, unsigned N = 0>
+void recursiveReadDataAndAddToCore(const QString& selectedDataElementType, hdps::Dataset<Points>& point_data, int32_t numDims, const std::vector<char>& contents)
+{
+    const QLatin1String nthDataElementTypeName(std::get<N>(PointData::getElementTypeNames()));
+
+    if (selectedDataElementType == nthDataElementTypeName)
+    {
+        readDataAndAddToCore<T, PointData::ElementTypeAt<N>>(point_data, numDims, contents);
+    }
+    else
+    {
+        recursiveReadDataAndAddToCore<T, N + 1>(selectedDataElementType, point_data, numDims, contents);
+    }
+}
+
+template <>
+void recursiveReadDataAndAddToCore<float, PointData::getNumberOfSupportedElementTypes()>(const QString&, hdps::Dataset<Points>&, int32_t, const std::vector<char>&)
+{
+    // This specialization does nothing, intensionally! 
+}
+
+template <>
+void recursiveReadDataAndAddToCore<unsigned char, PointData::getNumberOfSupportedElementTypes()>(const QString&, hdps::Dataset<Points>&, int32_t, const std::vector<char>&)
+{
+    // This specialization does nothing, intensionally! 
+}
 
 }
 
@@ -65,36 +139,13 @@ void BinLoader::loadData()
     // open dialog and wait for user input
     int ok = inputDialog.exec();
 
-    // convert binary data to float vector
-    std::vector<float> data;
-    if (ok == QDialog::Accepted) {
-        if (inputDialog.getDataType() == BinaryDataType::FLOAT)
-        {
-            for (int i = 0; i < contents.size() / 4; i++)
-            {
-                float f = ((float*) contents.data())[i];
-
-                data.push_back(f);
-            }
-        }
-        else if (inputDialog.getDataType() == BinaryDataType::UBYTE)
-        {
-            for (int i = 0; i < contents.size(); i++)
-            {
-                unsigned char c = (unsigned char) contents[i];
-
-                float f = (float)(c);
-                data.push_back(f);
-            }
-        }
-    }
-
-    // add data to the core
-    if (ok && !inputDialog.getDatasetName().isEmpty()) {
+    if (ok == QDialog::Accepted && !inputDialog.getDatasetName().isEmpty()) {
+    
+        auto sourceDataset = inputDialog.getSourceDataset();
+        auto numDims = inputDialog.getNumberOfDimensions();
+        auto storeAs = inputDialog.getStoreAs();
 
         Dataset<Points> point_data;
-
-        auto sourceDataset = inputDialog.getSourceDataset();
 
         if (sourceDataset.isValid())
             point_data = _core->createDerivedDataset<Points>(inputDialog.getDatasetName(), sourceDataset);
@@ -103,12 +154,16 @@ void BinLoader::loadData()
 
         events().notifyDatasetAdded(point_data);
 
-        point_data->setData(data.data(), data.size() / inputDialog.getNumberOfDimensions(), inputDialog.getNumberOfDimensions());
-        events().notifyDatasetChanged(point_data);
-
-        qDebug() << "Number of dimensions: " << point_data->getNumDimensions();
-        qDebug() << "BIN file loaded. Num data points: " << point_data->getNumPoints();
+        if (inputDialog.getDataType() == BinaryDataType::FLOAT)
+        {
+            recursiveReadDataAndAddToCore<float>(storeAs, point_data, numDims, contents);
+        }
+        else if (inputDialog.getDataType() == BinaryDataType::UBYTE)
+        {
+            recursiveReadDataAndAddToCore<unsigned char>(storeAs, point_data, numDims, contents);
+        }
     }
+
 }
 
 QIcon BinLoaderFactory::getIcon(const QColor& color /*= Qt::black*/) const
@@ -137,6 +192,7 @@ BinLoadingInputDialog::BinLoadingInputDialog(QWidget* parent, BinLoader& binLoad
     _datasetNameAction(this, "Dataset name", fileName),
     _dataTypeAction(this, "Data type", { "Float", "Unsigned Byte" }),
     _numberOfDimensionsAction(this, "Number of dimensions", 1, 1000000, 1),
+	_storeAsAction(this, "Store as"),
     _isDerivedAction(this, "Mark as derived", false),
     _datasetPickerAction(this, "Source dataset"),
     _loadAction(this, "Load"),
@@ -146,13 +202,22 @@ BinLoadingInputDialog::BinLoadingInputDialog(QWidget* parent, BinLoader& binLoad
 
     _numberOfDimensionsAction.setDefaultWidgetFlags(IntegralAction::WidgetFlag::SpinBox);
 
+    QStringList pointDataTypes;
+    for (const char* const typeName : PointData::getElementTypeNames())
+    {
+        pointDataTypes.append(QString::fromLatin1(typeName));
+    }
+    _storeAsAction.setOptions(pointDataTypes);
+
     // Load some settings
     _dataTypeAction.setCurrentIndex(binLoader.getSetting("DataType").toInt());
     _numberOfDimensionsAction.setValue(binLoader.getSetting("NumberOfDimensions").toInt());
+    _storeAsAction.setCurrentIndex(binLoader.getSetting("StoreAs").toInt());
 
     _groupAction.addAction(&_datasetNameAction);
     _groupAction.addAction(&_dataTypeAction);
     _groupAction.addAction(&_numberOfDimensionsAction);
+    _groupAction.addAction(&_storeAsAction);
     _groupAction.addAction(&_isDerivedAction);
     _groupAction.addAction(&_datasetPickerAction);
     _groupAction.addAction(&_loadAction);
@@ -196,6 +261,7 @@ BinLoadingInputDialog::BinLoadingInputDialog(QWidget* parent, BinLoader& binLoad
         // Save some settings
         binLoader.setSetting("DataType", _dataTypeAction.getCurrentIndex());
         binLoader.setSetting("NumberOfDimensions", _numberOfDimensionsAction.getValue());
+        binLoader.setSetting("StoreAs", _storeAsAction.getCurrentIndex());
 
         accept();
     });

@@ -110,7 +110,8 @@ private:
 
     void writeInfoTextForBinary(QString writePath, DataContent& dataContent);
 
-    bool _onlyIdices;
+private:
+    bool _onlyIdices;   // save indices, e.g. of a selection instead of data values
 
 };
 
