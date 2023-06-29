@@ -56,7 +56,7 @@ void BinExporter::writeData()
         const auto directoryPath = settings.value(directoryPathKey).toString() + "/";
         auto& inputDataset = _input;        // why does getInputDataset<Points>() throw an error? 
         QString fileName = QFileDialog::getSaveFileName(
-            nullptr, tr("Save data set"), directoryPath + inputDataset->getGuiName() + ".bin", tr("Binary file (*.bin);;All Files (*)"));
+            nullptr, tr("Save data set"), directoryPath + inputDataset->text() + ".bin", tr("Binary file (*.bin);;All Files (*)"));
 
         // Only continue when the dialog has not been not canceled and the file name is non-empty.
         if (fileName.isNull() || fileName.isEmpty())
@@ -136,7 +136,7 @@ DataContent BinExporter::retrieveDataSetContent(hdps::Dataset<Points> dataSet) {
 
         auto sourceData = dataSet->getSourceDataset<Points>();
 
-        dataContent.derivedFrom = sourceData->getGuiName();
+        dataContent.derivedFrom = sourceData->text();
         dataContent.sourceNumDimensions = sourceData->getNumDimensions();
         dataContent.sourceNumPoints = sourceData->getNumPoints();
     }

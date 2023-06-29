@@ -70,7 +70,8 @@ void readDataAndAddToCore(hdps::Dataset<Points>& point_data, int32_t numDims, co
 
     // add data to the core
     point_data->setData(std::move(data), numDims);
-    events().notifyDatasetChanged(point_data);
+    events().notifyDatasetDataChanged(point_data);
+    events().notifyDatasetDataDimensionsChanged(point_data);
 
     qDebug() << "Number of dimensions: " << point_data->getNumDimensions();
     qDebug() << "BIN file loaded. Num data points: " << point_data->getNumPoints();
@@ -190,13 +191,13 @@ DataTypes BinLoaderFactory::supportedDataTypes() const
 BinLoadingInputDialog::BinLoadingInputDialog(QWidget* parent, BinLoader& binLoader, QString fileName) :
     QDialog(parent),
     _datasetNameAction(this, "Dataset name", fileName),
-    _dataTypeAction(this, "Data type", { "Float32", "Unsigned Byte (Unit8)" }),
-    _numberOfDimensionsAction(this, "Number of dimensions", 1, 1000000, 1, 1),
-    _storeAsAction(this, "Store as"),
-    _isDerivedAction(this, "Mark as derived", false, false),
+    _dataTypeAction(this, "Data type", { "Float", "Unsigned Byte" }),
+    _numberOfDimensionsAction(this, "Number of dimensions", 1, 1000000, 1),
+	_storeAsAction(this, "Store as"),
+    _isDerivedAction(this, "Mark as derived", false),
     _datasetPickerAction(this, "Source dataset"),
     _loadAction(this, "Load"),
-    _groupAction(this)
+    _groupAction(this, "Settings")
 {
     setWindowTitle(tr("Binary Loader"));
 
@@ -214,13 +215,13 @@ BinLoadingInputDialog::BinLoadingInputDialog(QWidget* parent, BinLoader& binLoad
     _numberOfDimensionsAction.setValue(binLoader.getSetting("NumberOfDimensions").toInt());
     _storeAsAction.setCurrentIndex(binLoader.getSetting("StoreAs").toInt());
 
-    _groupAction << _datasetNameAction;
-    _groupAction << _dataTypeAction;
-    _groupAction << _numberOfDimensionsAction;
-    _groupAction << _storeAsAction;
-    _groupAction << _isDerivedAction;
-    _groupAction << _datasetPickerAction;
-    _groupAction << _loadAction;
+    _groupAction.addAction(&_datasetNameAction);
+    _groupAction.addAction(&_dataTypeAction);
+    _groupAction.addAction(&_numberOfDimensionsAction);
+    _groupAction.addAction(&_storeAsAction);
+    _groupAction.addAction(&_isDerivedAction);
+    _groupAction.addAction(&_datasetPickerAction);
+    _groupAction.addAction(&_loadAction);
 
     auto layout = new QVBoxLayout();
 
