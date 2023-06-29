@@ -70,7 +70,8 @@ void readDataAndAddToCore(hdps::Dataset<Points>& point_data, int32_t numDims, co
 
     // add data to the core
     point_data->setData(std::move(data), numDims);
-    events().notifyDatasetChanged(point_data);
+    events().notifyDatasetDataChanged(point_data);
+    events().notifyDatasetDataDimensionsChanged(point_data);
 
     qDebug() << "Number of dimensions: " << point_data->getNumDimensions();
     qDebug() << "BIN file loaded. Num data points: " << point_data->getNumPoints();
