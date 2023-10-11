@@ -11,10 +11,12 @@ add_definitions(-DQT_MESSAGELOGCONTEXT)
 # -----------------------------------------------------------------------------
 # Set install directory
 # -----------------------------------------------------------------------------
-# Get the env path and allow the user to change it
-set(INSTALL_DIR $ENV{HDPS_INSTALL_DIR} CACHE PATH "The HDPS Install Directoy")
-# Normalize the incoming install path
-file(TO_CMAKE_PATH ${INSTALL_DIR} INSTALL_DIR)
+# Check if the directory to the ManiVault installation has been provided
+if(NOT DEFINED MV_INSTALL_DIR)
+    set(MV_INSTALL_DIR "" CACHE PATH "Directory where ManiVault is installed")
+    message(FATAL_ERROR "Please set MV_INSTALL_DIR to the directory where ManiVault is installed")
+endif()
+file(TO_CMAKE_PATH ${MV_INSTALL_DIR} MV_INSTALL_DIR)
 
 # -----------------------------------------------------------------------------
 # Plugins
