@@ -14,7 +14,7 @@
 #include <QLabel>
 #include <QLineEdit>
 
-using namespace hdps::plugin;
+using namespace mv::plugin;
 
 // =============================================================================
 // Loading input box
@@ -73,19 +73,19 @@ public:
     }
 
     /** Get smart pointer to dataset (if any) */
-    hdps::Dataset<hdps::DatasetImpl> getSourceDataset() {
+    mv::Dataset<mv::DatasetImpl> getSourceDataset() {
         return _datasetPickerAction.getCurrentDataset();
     }
 
 protected:
-    hdps::gui::StringAction            _datasetNameAction;             /** Dataset name action */
-    hdps::gui::OptionAction            _dataTypeAction;                /** Data type action */
-    hdps::gui::IntegralAction          _numberOfDimensionsAction;      /** Number of dimensions action */
-    hdps::gui::OptionAction            _storeAsAction;                 /** Store as action */
-    hdps::gui::ToggleAction            _isDerivedAction;               /** Mark dataset as derived action */
-    hdps::gui::DatasetPickerAction     _datasetPickerAction;           /** Dataset picker action for picking source datasets */
-    hdps::gui::TriggerAction           _loadAction;                    /** Load action */
-    hdps::gui::GroupAction             _groupAction;                   /** Group action */
+    mv::gui::StringAction            _datasetNameAction;             /** Dataset name action */
+    mv::gui::OptionAction            _dataTypeAction;                /** Data type action */
+    mv::gui::IntegralAction          _numberOfDimensionsAction;      /** Number of dimensions action */
+    mv::gui::OptionAction            _storeAsAction;                 /** Store as action */
+    mv::gui::ToggleAction            _isDerivedAction;               /** Mark dataset as derived action */
+    mv::gui::DatasetPickerAction     _datasetPickerAction;           /** Dataset picker action for picking source datasets */
+    mv::gui::TriggerAction           _loadAction;                    /** Load action */
+    mv::gui::GroupAction             _groupAction;                   /** Group action */
 };
 
 // =============================================================================
@@ -111,7 +111,7 @@ public:
 
 class BinLoaderFactory : public LoaderPluginFactory
 {
-    Q_INTERFACES(hdps::plugin::LoaderPluginFactory hdps::plugin::PluginFactory)
+    Q_INTERFACES(mv::plugin::LoaderPluginFactory mv::plugin::PluginFactory)
     Q_OBJECT
     Q_PLUGIN_METADATA(IID   "nl.tudelft.BinLoader"
                       FILE  "BinLoader.json")
@@ -129,5 +129,5 @@ public:
 
     LoaderPlugin* produce() override;
 
-    hdps::DataTypes supportedDataTypes() const override;
+    mv::DataTypes supportedDataTypes() const override;
 };

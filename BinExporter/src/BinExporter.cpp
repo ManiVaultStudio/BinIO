@@ -18,8 +18,8 @@
 
 Q_PLUGIN_METADATA(IID "nl.tudelft.BinExporter")
 
-using namespace hdps;
-using namespace hdps::gui;
+using namespace mv;
+using namespace mv::gui;
 
 BinExporter::BinExporter(const PluginFactory* factory) :
     WriterPlugin(factory),
@@ -85,7 +85,7 @@ void BinExporter::writeData()
     }
 }
 
-DataContent BinExporter::retrieveDataSetContent(hdps::Dataset<Points> dataSet) {
+DataContent BinExporter::retrieveDataSetContent(mv::Dataset<Points> dataSet) {
     DataContent dataContent;
     std::vector<float> dataFromSet;
 
@@ -200,7 +200,7 @@ DataTypes BinExporterFactory::supportedDataTypes() const
     return supportedTypes;
 }
 
-PluginTriggerActions BinExporterFactory::getPluginTriggerActions(const hdps::Datasets& datasets) const
+PluginTriggerActions BinExporterFactory::getPluginTriggerActions(const mv::Datasets& datasets) const
 {
     PluginTriggerActions pluginTriggerActions;
 

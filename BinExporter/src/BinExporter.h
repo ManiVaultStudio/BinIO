@@ -14,8 +14,8 @@
 #include <QLineEdit>
 #include <QCheckBox> 
 
-using namespace hdps::plugin;
-using namespace hdps::gui;
+using namespace mv::plugin;
+using namespace mv::gui;
 
 struct DataContent {
     DataContent() : dataVals{}, numDimensions(0), numPoints(0), isDerived(false), onlyIndices(false), derivedFrom(""), sourceNumDimensions(0), sourceNumPoints(0) {};
@@ -96,7 +96,7 @@ private:
      *
      * \param dataSetName Data set name to request from core
     */
-    DataContent retrieveDataSetContent(hdps::Dataset<Points> dataSet);
+    DataContent retrieveDataSetContent(mv::Dataset<Points> dataSet);
 
     /*! Write vector contents to disk
      * Stores content in little endian binary form.
@@ -122,7 +122,7 @@ private:
 
 class BinExporterFactory : public WriterPluginFactory
 {
-    Q_INTERFACES(hdps::plugin::WriterPluginFactory hdps::plugin::PluginFactory)
+    Q_INTERFACES(mv::plugin::WriterPluginFactory mv::plugin::PluginFactory)
         Q_OBJECT
         Q_PLUGIN_METADATA(IID   "nl.tudelft.BinExporter"
             FILE  "BinExporter.json")
@@ -140,12 +140,12 @@ public:
 
     WriterPlugin* produce() override;
 
-    hdps::DataTypes supportedDataTypes() const override;
+    mv::DataTypes supportedDataTypes() const override;
 
     /**
      * Get plugin trigger actions given \p datasets
      * @param datasets Vector of input datasets
      * @return Vector of plugin trigger actions
      */
-    PluginTriggerActions getPluginTriggerActions(const hdps::Datasets& datasets) const override;
+    PluginTriggerActions getPluginTriggerActions(const mv::Datasets& datasets) const override;
 };

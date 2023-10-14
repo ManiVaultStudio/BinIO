@@ -17,8 +17,8 @@
 
 Q_PLUGIN_METADATA(IID "nl.tudelft.BinLoader")
 
-using namespace hdps;
-using namespace hdps::gui;
+using namespace mv;
+using namespace mv::gui;
 
 // =============================================================================
 // View
@@ -38,7 +38,7 @@ namespace {
 
 
 template <typename T, typename S>
-void readDataAndAddToCore(hdps::Dataset<Points>& point_data, int32_t numDims, const std::vector<char>& contents)
+void readDataAndAddToCore(mv::Dataset<Points>& point_data, int32_t numDims, const std::vector<char>& contents)
 {
 
     // convert binary data to float vector
@@ -80,7 +80,7 @@ void readDataAndAddToCore(hdps::Dataset<Points>& point_data, int32_t numDims, co
 
 // Recursively searches for the data element type that is specified by the selectedDataElementType parameter. 
 template <typename T, unsigned N = 0>
-void recursiveReadDataAndAddToCore(const QString& selectedDataElementType, hdps::Dataset<Points>& point_data, int32_t numDims, const std::vector<char>& contents)
+void recursiveReadDataAndAddToCore(const QString& selectedDataElementType, mv::Dataset<Points>& point_data, int32_t numDims, const std::vector<char>& contents)
 {
     const QLatin1String nthDataElementTypeName(std::get<N>(PointData::getElementTypeNames()));
 
@@ -95,13 +95,13 @@ void recursiveReadDataAndAddToCore(const QString& selectedDataElementType, hdps:
 }
 
 template <>
-void recursiveReadDataAndAddToCore<float, PointData::getNumberOfSupportedElementTypes()>(const QString&, hdps::Dataset<Points>&, int32_t, const std::vector<char>&)
+void recursiveReadDataAndAddToCore<float, PointData::getNumberOfSupportedElementTypes()>(const QString&, mv::Dataset<Points>&, int32_t, const std::vector<char>&)
 {
     // This specialization does nothing, intensionally! 
 }
 
 template <>
-void recursiveReadDataAndAddToCore<unsigned char, PointData::getNumberOfSupportedElementTypes()>(const QString&, hdps::Dataset<Points>&, int32_t, const std::vector<char>&)
+void recursiveReadDataAndAddToCore<unsigned char, PointData::getNumberOfSupportedElementTypes()>(const QString&, mv::Dataset<Points>&, int32_t, const std::vector<char>&)
 {
     // This specialization does nothing, intensionally! 
 }
@@ -235,7 +235,7 @@ BinLoadingInputDialog::BinLoadingInputDialog(QWidget* parent, BinLoader& binLoad
         if (_isDerivedAction.isChecked()) {
 
             // Get unique identifier and gui names from all point data sets in the core
-            auto dataSets = hdps::Application::core()->requestAllDataSets(QVector<hdps::DataType> {PointType});
+            auto dataSets = mv::Application::core()->requestAllDataSets(QVector<mv::DataType> {PointType});
 
             // Assign found dataset(s)
             _datasetPickerAction.setDatasets(dataSets);
@@ -243,7 +243,7 @@ BinLoadingInputDialog::BinLoadingInputDialog(QWidget* parent, BinLoader& binLoad
         else {
 
             // Assign found dataset(s)
-            _datasetPickerAction.setDatasets(hdps::Datasets());
+            _datasetPickerAction.setDatasets(mv::Datasets());
         }
 
         // Disable dataset picker when not marked as derived
