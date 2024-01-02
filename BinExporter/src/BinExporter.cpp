@@ -2,19 +2,13 @@
 
 #include <actions/PluginTriggerAction.h>
 
-#include "Set.h"
-
-#include <QtCore>
-#include <QtDebug>
-#include <QInputDialog>
 #include <QFileDialog>
-#include <QSettings>
 #include <QFileInfo>
+#include <QSettings>
 
 #include <fstream>
-#include <iterator>
+#include <numeric>
 #include <vector>
-#include <algorithm>
 
 Q_PLUGIN_METADATA(IID "nl.tudelft.BinExporter")
 
@@ -54,7 +48,7 @@ void BinExporter::writeData()
         QSettings settings(QLatin1String{ "HDPS" }, QLatin1String{ "Plugins/" } +getKind());
         const QLatin1String directoryPathKey("directoryPath");
         const auto directoryPath = settings.value(directoryPathKey).toString() + "/";
-        auto& inputDataset = _input;        // why does getInputDataset<Points>() throw an error? 
+        auto inputDataset = getInputDataset<Points>();
         QString fileName = QFileDialog::getSaveFileName(
             nullptr, tr("Save data set"), directoryPath + inputDataset->text() + ".bin", tr("Binary file (*.bin);;All Files (*)"));
 
@@ -70,7 +64,6 @@ void BinExporter::writeData()
             settings.setValue(directoryPathKey, QFileInfo(fileName).absolutePath());
 
             // get data from core
-            auto& inputDataset = _input;        // why does getInputDataset<Points>() throw an error? 
             DataContent dataContent = retrieveDataSetContent(inputDataset);
             writeVecToBinary(dataContent.dataVals, fileName);
             writeInfoTextForBinary(fileName, dataContent);
@@ -85,7 +78,7 @@ void BinExporter::writeData()
     }
 }
 
-DataContent BinExporter::retrieveDataSetContent(mv::Dataset<Points> dataSet) {
+DataContent BinExporter::retrieveDataSetContent(mv::Dataset<Points> dataSet) const {
     DataContent dataContent;
     std::vector<float> dataFromSet;
 
@@ -211,7 +204,7 @@ PluginTriggerActions BinExporterFactory::getPluginTriggerActions(const mv::Datas
     if (PluginFactory::areAllDatasetsOfTheSameType(datasets, PointType)) {
         if (datasets.count() >= 1) {
             auto pluginTriggerAction = new PluginTriggerAction(const_cast<BinExporterFactory*>(this), this, "BinExporter", "Export dataset to binary file", getIcon(), [this, getPluginInstance, datasets](PluginTriggerAction& pluginTriggerAction) -> void {
-                for (auto dataset : datasets)
+                for (const auto& dataset : datasets)
                     getPluginInstance(dataset);
             });
 
