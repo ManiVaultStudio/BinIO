@@ -4,15 +4,12 @@
 
 #include "PointData/PointData.h"
 
-#include <QDialog>
 #include <QCheckBox>
-#include <QHBoxLayout>
-#include <QPushButton>
 #include <QComboBox>
-#include <QSpinBox>
+#include <QDialog>
+#include <QHBoxLayout>
 #include <QLabel>
-#include <QLineEdit>
-#include <QCheckBox> 
+#include <QPushButton>
 
 using namespace mv::plugin;
 using namespace mv::gui;
@@ -73,7 +70,7 @@ public slots:
 
 private:
     QCheckBox       saveIndices;
-    QPushButton writeButton;
+    QPushButton     writeButton;
 };
 
 // =============================================================================
@@ -96,7 +93,7 @@ private:
      *
      * \param dataSetName Data set name to request from core
     */
-    DataContent retrieveDataSetContent(mv::Dataset<Points> dataSet);
+    DataContent retrieveDataSetContent(mv::Dataset<Points> dataSet) const;
 
     /*! Write vector contents to disk
      * Stores content in little endian binary form.
