@@ -2,7 +2,7 @@
 
 #include <PointData/PointData.h>
 
-#include "Set.h"
+#include <Set.h>
 
 #include <QtCore>
 #include <QtDebug>
@@ -149,9 +149,9 @@ void BinLoader::loadData()
         Dataset<Points> point_data;
 
         if (sourceDataset.isValid())
-            point_data = _core->createDerivedDataset<Points>(inputDialog.getDatasetName(), sourceDataset);
+            point_data = mv::data().createDerivedDataset<Points>(inputDialog.getDatasetName(), sourceDataset);
         else
-            point_data = _core->addDataset<Points>("Points", inputDialog.getDatasetName());
+            point_data = mv::data().createDataset<Points>("Points", inputDialog.getDatasetName());
 
         if (inputDialog.getDataType() == BinaryDataType::FLOAT)
         {
