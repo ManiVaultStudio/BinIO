@@ -1,18 +1,15 @@
 #pragma once
 
 #include <actions/DatasetPickerAction.h>
+#include <actions/GroupAction.h>
+#include <actions/IntegralAction.h>
+#include <actions/OptionAction.h>
+#include <actions/StringAction.h>
+#include <actions/TriggerAction.h>
 
 #include <LoaderPlugin.h>
 
 #include <QDialog>
-#include <QCheckBox>
-#include <QGridLayout>
-#include <QPushButton>
-#include <QComboBox>
-#include <QCheckBox>
-#include <QSpinBox>
-#include <QLabel>
-#include <QLineEdit>
 
 using namespace mv::plugin;
 

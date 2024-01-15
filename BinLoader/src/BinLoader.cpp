@@ -7,13 +7,9 @@
 #include <QtCore>
 #include <QtDebug>
 
-#include <vector>
-#include <QInputDialog>
-
 #include <fstream>
-#include <iterator>
-#include <vector>
 #include <type_traits>
+#include <vector>
 
 Q_PLUGIN_METADATA(IID "nl.tudelft.BinLoader")
 
