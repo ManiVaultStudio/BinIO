@@ -2,6 +2,8 @@
 
 #include <PointData/PointData.h>
 
+#include <Set.h>
+
 #include <QtCore>
 #include <QtDebug>
 
@@ -143,11 +145,9 @@ void BinLoader::loadData()
         Dataset<Points> point_data;
 
         if (sourceDataset.isValid())
-            point_data = _core->createDerivedDataset<Points>(inputDialog.getDatasetName(), sourceDataset);
+            point_data = mv::data().createDerivedDataset<Points>(inputDialog.getDatasetName(), sourceDataset);
         else
-            point_data = _core->addDataset<Points>("Points", inputDialog.getDatasetName());
-
-        events().notifyDatasetAdded(point_data);
+            point_data = mv::data().createDataset<Points>("Points", inputDialog.getDatasetName());
 
         if (inputDialog.getDataType() == BinaryDataType::FLOAT)
         {
@@ -229,7 +229,7 @@ BinLoadingInputDialog::BinLoadingInputDialog(QWidget* parent, BinLoader& binLoad
         if (_isDerivedAction.isChecked()) {
 
             // Get unique identifier and gui names from all point data sets in the core
-            auto dataSets = mv::Application::core()->requestAllDataSets(QVector<mv::DataType> {PointType});
+            auto dataSets = mv::data().getAllDatasets(std::vector<mv::DataType> {PointType});
 
             // Assign found dataset(s)
             _datasetPickerAction.setDatasets(dataSets);
