@@ -7,6 +7,7 @@
 #include <QtCore>
 #include <QtDebug>
 
+#include <cstdlib>
 #include <fstream>
 #include <type_traits>
 #include <vector>
@@ -63,6 +64,9 @@ void readDataAndAddToCore(mv::Dataset<Points>& point_data, int32_t numDims, cons
     {
         qWarning() << "BinLoader.cpp::readDataAndAddToCore: No data loaded. Template typename not implemented.";
     }
+
+    if(std::lldiv(static_cast<long long>(data.size()), static_cast<long long>(numDims)).rem != 0)
+        qWarning() << "WARNING: BinLoader.cpp::readDataAndAddToCore: Data size divided by number of dimension is not an integer. Something might have gone wrong.";
 
     // add data to the core
     point_data->setData(std::move(data), numDims);
