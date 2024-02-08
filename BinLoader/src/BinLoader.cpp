@@ -67,7 +67,6 @@ void readDataAndAddToCore(mv::Dataset<Points>& point_data, int32_t numDims, cons
     // add data to the core
     point_data->setData(std::move(data), numDims);
     events().notifyDatasetDataChanged(point_data);
-    events().notifyDatasetDataDimensionsChanged(point_data);
 
     qDebug() << "Number of dimensions: " << point_data->getNumDimensions();
     qDebug() << "BIN file loaded. Num data points: " << point_data->getNumPoints();
