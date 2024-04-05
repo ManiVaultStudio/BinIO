@@ -203,7 +203,7 @@ PluginTriggerActions BinExporterFactory::getPluginTriggerActions(const mv::Datas
 
     if (PluginFactory::areAllDatasetsOfTheSameType(datasets, PointType)) {
         if (datasets.count() >= 1) {
-            auto pluginTriggerAction = new PluginTriggerAction(const_cast<BinExporterFactory*>(this), this, "BinExporter", "Export dataset to binary file", getIcon(), [this, getPluginInstance, datasets](PluginTriggerAction& pluginTriggerAction) -> void {
+            auto pluginTriggerAction = new PluginTriggerAction(const_cast<BinExporterFactory*>(this), this, "BIN Exporter", "Export dataset to binary file", getIcon(), [this, getPluginInstance, datasets](PluginTriggerAction& pluginTriggerAction) -> void {
                 for (const auto& dataset : datasets)
                     getPluginInstance(dataset);
             });
