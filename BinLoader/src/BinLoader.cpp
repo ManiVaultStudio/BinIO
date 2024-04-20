@@ -46,7 +46,7 @@ void readDataAndAddToCore(mv::Dataset<Points>& point_data, int32_t numDims, cons
     };
 
     if constexpr (std::is_same_v<T, float>) {
-        for (int i = 0; i < contents.size() / 4; i++)
+        for (size_t i = 0; i < contents.size() / 4; i++)
         {
             float f = ((float*)contents.data())[i];
             add_to_data(f);
@@ -54,7 +54,7 @@ void readDataAndAddToCore(mv::Dataset<Points>& point_data, int32_t numDims, cons
     }
     else if constexpr (std::is_same_v<T, unsigned char>)
     {
-        for (int i = 0; i < contents.size(); i++)
+        for (size_t i = 0; i < contents.size(); i++)
         {
             T c = static_cast<T>(contents[i]);
             add_to_data(c);
