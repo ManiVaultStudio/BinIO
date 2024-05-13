@@ -100,8 +100,8 @@ class BinIOPluginConan(ConanFile):
         # Give the installation directory to CMake
         tc.variables["MV_INSTALL_DIR"] = self.install_dir
 
+        # Find ManiVault with find_package
         self.manivault_dir = self.install_dir + '/cmake/mv/'
-        print("ManiVault_DIR: ", self.manivault_dir)
         tc.variables["ManiVault_DIR"] = self.manivault_dir
         
         tc.generate()
@@ -131,7 +131,6 @@ class BinIOPluginConan(ConanFile):
     def package(self):
         package_dir = os.path.join(self.build_folder, "install")
         print("Packaging install dir: ", package_dir)
-        print("ManiVault_DIR: ", self.manivault_dir)
         subprocess.run(
             [
                 "cmake",
@@ -141,7 +140,6 @@ class BinIOPluginConan(ConanFile):
                 "Debug",
                 "--prefix",
                 os.path.join(package_dir, "Debug"),
-                f"-DManiVault_DIR {self.manivault_dir}",
             ]
         )
         subprocess.run(
@@ -153,7 +151,6 @@ class BinIOPluginConan(ConanFile):
                 "Release",
                 "--prefix",
                 os.path.join(package_dir, "Release"),
-                f"-DManiVault_DIR {self.manivault_dir}",
             ]
         )
         self.copy(pattern="*", src=package_dir)
