@@ -130,6 +130,7 @@ class BinIOPluginConan(ConanFile):
     def package(self):
         package_dir = os.path.join(self.build_folder, "install")
         print("Packaging install dir: ", package_dir)
+        print("ManiVault_DIR: ", self.manivault_dir)
         subprocess.run(
             [
                 "cmake",
