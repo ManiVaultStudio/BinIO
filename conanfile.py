@@ -107,7 +107,7 @@ class BinIOPluginConan(ConanFile):
         # Give the installation directory to CMake
         tc.variables["MV_INSTALL_DIR"] = self.install_dir
 
-        self.manivault_dir = self.install_dir + 'cmake/mv/'
+        self.manivault_dir = self.install_dir + '/cmake/mv/'
         print("ManiVault_DIR: ", self.manivault_dir)
         tc.variables["ManiVault_DIR"] = self.manivault_dir
         
