@@ -25,6 +25,9 @@ find_package(Qt6 COMPONENTS Widgets WebEngineWidgets REQUIRED)
 
 find_package(ManiVault COMPONENTS Core PointData CONFIG)
 
+message(STATUS "BINIO: ${ManiVault_FOUND}")
+message(STATUS "BINIO: ${ManiVault_INCLUDE_DIR}")
+
 # -----------------------------------------------------------------------------
 # Source files
 # -----------------------------------------------------------------------------
