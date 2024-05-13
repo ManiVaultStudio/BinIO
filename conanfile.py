@@ -147,8 +147,7 @@ class BinIOPluginConan(ConanFile):
                 "Debug",
                 "--prefix",
                 os.path.join(package_dir, "Debug"),
-                "-DManiVault_DIR",
-                self.manivault_dir,
+                f"-DManiVault_DIR {self.manivault_dir}",
             ]
         )
         subprocess.run(
@@ -160,8 +159,7 @@ class BinIOPluginConan(ConanFile):
                 "Release",
                 "--prefix",
                 os.path.join(package_dir, "Release"),
-                "-DManiVault_DIR",
-                self.manivault_dir,
+                f"-DManiVault_DIR {self.manivault_dir}",
             ]
         )
         self.copy(pattern="*", src=package_dir)
