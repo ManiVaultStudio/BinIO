@@ -19,16 +19,16 @@ class BinIOPluginConan(ConanFile):
     """Class to package BinIOPlugin using conan
 
     Packages both RELEASE and DEBUG.
-    Uses rules_support (github.com/hdps/rulessupport) to derive
-    versioninfo based on the branch naming convention
-    as described in https://github.com/hdps/core/wiki/Branch-naming-rules
+    Uses rules_support (github.com/ManiVaultStudio/rulessupport) to derive
+    version info based on the branch naming convention
+    as described in https://github.com/ManiVaultStudio/core/wiki/Branch-naming-rules
     """
 
     name = "BinIOPlugin"
     description = """Plugins for reading and writing binary data
                   in the high-dimensional plugin system (HDPS)."""
     topics = ("hdps", "plugin", "binary data", "loading", "writing")
-    url = "https://github.com/hdps/BinIOPlugin"
+    url = "https://github.com/ManiVaultStudio/BinIO"
     author = "B. van Lew b.van_lew@lumc.nl"  # conan recipe author
     license = "MIT"
 
