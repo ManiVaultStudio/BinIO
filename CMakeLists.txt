@@ -8,8 +8,6 @@ PROJECT(${PROJECT})
 
 add_definitions(-DQT_MESSAGELOGCONTEXT)
 
-message(STATUS "BINIO: ${ManiVault_DIR}")
-
 # -----------------------------------------------------------------------------
 # Plugins
 # -----------------------------------------------------------------------------
