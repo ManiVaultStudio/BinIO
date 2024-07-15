@@ -19,16 +19,16 @@ class BinIOPluginConan(ConanFile):
     """Class to package BinIOPlugin using conan
 
     Packages both RELEASE and DEBUG.
-    Uses rules_support (github.com/hdps/rulessupport) to derive
-    versioninfo based on the branch naming convention
-    as described in https://github.com/hdps/core/wiki/Branch-naming-rules
+    Uses rules_support (github.com/ManiVaultStudio/rulessupport) to derive
+    version info based on the branch naming convention
+    as described in https://github.com/ManiVaultStudio/core/wiki/Branch-naming-rules
     """
 
     name = "BinIOPlugin"
     description = """Plugins for reading and writing binary data
                   in the high-dimensional plugin system (HDPS)."""
     topics = ("hdps", "plugin", "binary data", "loading", "writing")
-    url = "https://github.com/hdps/BinIOPlugin"
+    url = "https://github.com/ManiVaultStudio/BinIO"
     author = "B. van Lew b.van_lew@lumc.nl"  # conan recipe author
     license = "MIT"
 
@@ -106,6 +106,10 @@ class BinIOPluginConan(ConanFile):
         self.install_dir = pathlib.Path(os.environ["MV_INSTALL_DIR"]).as_posix()
         # Give the installation directory to CMake
         tc.variables["MV_INSTALL_DIR"] = self.install_dir
+
+        # Find ManiVault with find_package
+        self.manivault_dir = self.install_dir + '/cmake/mv/'
+        tc.variables["ManiVault_DIR"] = self.manivault_dir
         
         tc.generate()
 
