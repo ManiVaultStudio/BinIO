@@ -82,6 +82,11 @@ add_custom_command(TARGET ${BINLOADER} POST_BUILD
         --prefix ${ManiVault_INSTALL_DIR}/$<CONFIGURATION>
 )
 
+set_target_properties(${BINLOADER}
+    PROPERTIES
+    FOLDER LoaderPlugins
+)
+
 # -----------------------------------------------------------------------------
 # Miscellaneous
 # -----------------------------------------------------------------------------
