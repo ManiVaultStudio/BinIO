@@ -44,13 +44,16 @@ void BinExporter::writeData()
 
     if ((ok == QDialog::Accepted)) {
 
-        // Let the user chose the save path
-        QSettings settings(QLatin1String{ "HDPS" }, QLatin1String{ "Plugins/" } +getKind());
-        const QLatin1String directoryPathKey("directoryPath");
-        const auto directoryPath = settings.value(directoryPathKey).toString() + "/";
+        // Let the user choose the save path
+        QString registryEntry = "directoryPath";
+        const auto directoryPath = getSetting(registryEntry, "").toString();
+
         auto inputDataset = getInputDataset<Points>();
         QString fileName = QFileDialog::getSaveFileName(
-            nullptr, tr("Save data set"), directoryPath + inputDataset->text() + ".bin", tr("Binary file (*.bin);;All Files (*)"));
+            nullptr, 
+            tr("Save data set"), 
+            directoryPath + inputDataset->text() + ".bin", 
+            tr("Binary file (*.bin);;All Files (*)"));
 
         // Only continue when the dialog has not been not canceled and the file name is non-empty.
         if (fileName.isNull() || fileName.isEmpty())
@@ -61,7 +64,7 @@ void BinExporter::writeData()
         else
         {
             // store the directory name
-            settings.setValue(directoryPathKey, QFileInfo(fileName).absolutePath());
+            setSetting(registryEntry, QFileInfo(fileName).absolutePath());
 
             // get data from core
             DataContent dataContent = retrieveDataSetContent(inputDataset);
