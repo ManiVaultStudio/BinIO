@@ -114,7 +114,8 @@ class BinLoaderFactory : public LoaderPluginFactory
                       FILE  "BinLoader.json")
 
 public:
-    BinLoaderFactory(void) {}
+    BinLoaderFactory(void);
+
     ~BinLoaderFactory(void) override {}
 
     LoaderPlugin* produce() override;
