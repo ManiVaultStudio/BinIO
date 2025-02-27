@@ -184,11 +184,6 @@ WriterPlugin* BinExporterFactory::produce()
     return new BinExporter(this);
 }
 
-QIcon BinExporterFactory::getIcon(const QColor& color /*= Qt::black*/) const
-{
-    return Application::getIconFont("FontAwesome").getIcon("database", color);
-}
-
 DataTypes BinExporterFactory::supportedDataTypes() const
 {
     DataTypes supportedTypes;
