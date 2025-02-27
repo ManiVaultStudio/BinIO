@@ -125,15 +125,9 @@ class BinExporterFactory : public WriterPluginFactory
             FILE  "BinExporter.json")
 
 public:
-    BinExporterFactory(void) {}
-    ~BinExporterFactory(void) override {}
+    BinExporterFactory();
 
-    /**
-     * Get plugin icon
-     * @param color Icon color for flat (font) icons
-     * @return Icon
-     */
-    QIcon getIcon(const QColor& color = Qt::black) const override;
+    ~BinExporterFactory(void) override {}
 
     WriterPlugin* produce() override;
 

@@ -179,14 +179,14 @@ void BinExporter::writeInfoTextForBinary(QString writePath, DataContent& dataCon
 // Factory
 // =============================================================================
 
+BinExporterFactory::BinExporterFactory()
+{
+    setIconByName("database");
+}
+
 WriterPlugin* BinExporterFactory::produce()
 {
     return new BinExporter(this);
-}
-
-QIcon BinExporterFactory::getIcon(const QColor& color /*= Qt::black*/) const
-{
-    return Application::getIconFont("FontAwesome").getIcon("database", color);
 }
 
 DataTypes BinExporterFactory::supportedDataTypes() const
@@ -206,7 +206,7 @@ PluginTriggerActions BinExporterFactory::getPluginTriggerActions(const mv::Datas
 
     if (PluginFactory::areAllDatasetsOfTheSameType(datasets, PointType)) {
         if (datasets.count() >= 1) {
-            auto pluginTriggerAction = new PluginTriggerAction(const_cast<BinExporterFactory*>(this), this, "BIN Exporter", "Export dataset to binary file", getIcon(), [this, getPluginInstance, datasets](PluginTriggerAction& pluginTriggerAction) -> void {
+            auto pluginTriggerAction = new PluginTriggerAction(const_cast<BinExporterFactory*>(this), this, "BIN Exporter", "Export dataset to binary file", icon(), [this, getPluginInstance, datasets](PluginTriggerAction& pluginTriggerAction) -> void {
                 for (const auto& dataset : datasets)
                     getPluginInstance(dataset);
             });

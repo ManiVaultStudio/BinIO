@@ -114,15 +114,9 @@ class BinLoaderFactory : public LoaderPluginFactory
                       FILE  "BinLoader.json")
 
 public:
-    BinLoaderFactory(void) {}
-    ~BinLoaderFactory(void) override {}
+    BinLoaderFactory(void);
 
-    /**
-     * Get plugin icon
-     * @param color Icon color for flat (font) icons
-     * @return Icon
-     */
-    QIcon getIcon(const QColor& color = Qt::black) const override;
+    ~BinLoaderFactory(void) override {}
 
     LoaderPlugin* produce() override;
 
