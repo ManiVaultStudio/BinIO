@@ -179,6 +179,11 @@ void BinExporter::writeInfoTextForBinary(QString writePath, DataContent& dataCon
 // Factory
 // =============================================================================
 
+BinExporterFactory::BinExporterFactory()
+{
+    setIconByName("database");
+}
+
 WriterPlugin* BinExporterFactory::produce()
 {
     return new BinExporter(this);

@@ -125,7 +125,8 @@ class BinExporterFactory : public WriterPluginFactory
             FILE  "BinExporter.json")
 
 public:
-    BinExporterFactory(void) {}
+    BinExporterFactory();
+
     ~BinExporterFactory(void) override {}
 
     WriterPlugin* produce() override;
