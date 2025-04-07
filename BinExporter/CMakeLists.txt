@@ -69,11 +69,10 @@ install(TARGETS ${BINEXPORTER}
 )
 
 add_custom_command(TARGET ${BINEXPORTER} POST_BUILD
-    DEPENDS BinExporter
     COMMAND "${CMAKE_COMMAND}"
-        --install ${CMAKE_CURRENT_BINARY_DIR}
-        --config $<CONFIGURATION>
-        --prefix ${ManiVault_INSTALL_DIR}/$<CONFIGURATION>
+    --install ${CMAKE_CURRENT_BINARY_DIR}
+    --config $<CONFIGURATION>
+    --prefix ${ManiVault_INSTALL_DIR}/$<CONFIGURATION>
 )
 
 set_target_properties(${BINEXPORTER}

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.17)
+cmake_minimum_required(VERSION 3.22)
 
 # -----------------------------------------------------------------------------
 # BinLoader Plugin
@@ -69,11 +69,10 @@ install(TARGETS ${BINLOADER}
 )
 
 add_custom_command(TARGET ${BINLOADER} POST_BUILD
-    DEPENDS BinLoader
     COMMAND "${CMAKE_COMMAND}"
-        --install ${CMAKE_CURRENT_BINARY_DIR}
-        --config $<CONFIGURATION>
-        --prefix ${ManiVault_INSTALL_DIR}/$<CONFIGURATION>
+    --install ${CMAKE_CURRENT_BINARY_DIR}
+    --config $<CONFIGURATION>
+    --prefix ${ManiVault_INSTALL_DIR}/$<CONFIGURATION>
 )
 
 set_target_properties(${BINLOADER}
