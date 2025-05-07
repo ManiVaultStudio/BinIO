@@ -6,8 +6,6 @@ cmake_minimum_required(VERSION 3.22)
 set(PROJECT "BinIO")
 PROJECT(${PROJECT})
 
-add_definitions(-DQT_MESSAGELOGCONTEXT)
-
 # -----------------------------------------------------------------------------
 # Plugins
 # -----------------------------------------------------------------------------

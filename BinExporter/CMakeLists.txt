@@ -4,7 +4,8 @@ cmake_minimum_required(VERSION 3.22)
 # BinExporter Plugin
 # -----------------------------------------------------------------------------
 set(BINEXPORTER "BinExporter")
-PROJECT(${BINEXPORTER})
+PROJECT(${BINEXPORTER} 
+        LANGUAGES CXX)
 
 # -----------------------------------------------------------------------------
 # CMake Options
@@ -72,6 +73,7 @@ add_custom_command(TARGET ${BINEXPORTER} POST_BUILD
     COMMAND "${CMAKE_COMMAND}"
     --install ${CMAKE_CURRENT_BINARY_DIR}
     --config $<CONFIGURATION>
+    --component PLUGINS
     --prefix ${ManiVault_INSTALL_DIR}/$<CONFIGURATION>
 )
 
