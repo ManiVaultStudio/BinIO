@@ -12,7 +12,7 @@
 #include <type_traits>
 #include <vector>
 
-Q_PLUGIN_METADATA(IID "nl.tudelft.BinLoader")
+Q_PLUGIN_METADATA(IID "studio.manivault.BinLoader")
 
 using namespace mv;
 using namespace mv::gui;
