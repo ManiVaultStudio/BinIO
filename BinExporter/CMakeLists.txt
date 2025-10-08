@@ -33,15 +33,19 @@ find_package(ManiVault COMPONENTS Core PointData CONFIG QUIET)
 set(SOURCES
     src/BinExporter.h
     src/BinExporter.cpp
-    src/BinExporter.json
 )
 
-source_group( Plugin FILES ${SOURCES})
+set(AUX
+    PluginInfo.json
+)
+
+source_group(Plugin FILES ${SOURCES})
+source_group(Aux FILES ${AUX})
 
 # -----------------------------------------------------------------------------
 # CMake Target
 # -----------------------------------------------------------------------------
-add_library(${BINEXPORTER} SHARED ${SOURCES})
+add_library(${BINEXPORTER} SHARED ${SOURCES} ${AUX})
 
 # -----------------------------------------------------------------------------
 # Target include directories
@@ -77,10 +81,7 @@ add_custom_command(TARGET ${BINEXPORTER} POST_BUILD
     --prefix ${ManiVault_INSTALL_DIR}/$<CONFIGURATION>
 )
 
-set_target_properties(${BINEXPORTER}
-    PROPERTIES
-    FOLDER WriterPlugins
-)
+mv_handle_plugin_config(${BINEXPORTER})
 
 # -----------------------------------------------------------------------------
 # Miscellaneous

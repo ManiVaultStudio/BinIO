@@ -33,15 +33,19 @@ find_package(ManiVault COMPONENTS Core PointData CONFIG QUIET)
 set(SOURCES
     src/BinLoader.h
     src/BinLoader.cpp
-    src/BinLoader.json
 )
 
-source_group( Plugin FILES ${SOURCES})
+set(AUX
+    PluginInfo.json
+)
+
+source_group(Plugin FILES ${SOURCES})
+source_group(Aux FILES ${AUX})
 
 # -----------------------------------------------------------------------------
 # CMake Target
 # -----------------------------------------------------------------------------
-add_library(${BINLOADER} SHARED ${SOURCES})
+add_library(${BINLOADER} SHARED ${SOURCES} ${AUX})
 
 # -----------------------------------------------------------------------------
 # Target include directories
@@ -77,10 +81,7 @@ add_custom_command(TARGET ${BINLOADER} POST_BUILD
     --prefix ${ManiVault_INSTALL_DIR}/$<CONFIGURATION>
 )
 
-set_target_properties(${BINLOADER}
-    PROPERTIES
-    FOLDER LoaderPlugins
-)
+mv_handle_plugin_config(${BINLOADER})
 
 # -----------------------------------------------------------------------------
 # Miscellaneous

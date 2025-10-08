@@ -10,7 +10,7 @@
 #include <numeric>
 #include <vector>
 
-Q_PLUGIN_METADATA(IID "nl.tudelft.BinExporter")
+Q_PLUGIN_METADATA(IID "studio.manivault.BinExporter")
 
 using namespace mv;
 using namespace mv::gui;
