@@ -111,7 +111,7 @@ class BinLoaderFactory : public LoaderPluginFactory
     Q_INTERFACES(mv::plugin::LoaderPluginFactory mv::plugin::PluginFactory)
     Q_OBJECT
     Q_PLUGIN_METADATA(IID   "nl.tudelft.BinLoader"
-                      FILE  "BinLoader.json")
+                      FILE  "PluginInfo.json")
 
 public:
     BinLoaderFactory(void);

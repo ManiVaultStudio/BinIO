@@ -122,7 +122,7 @@ class BinExporterFactory : public WriterPluginFactory
     Q_INTERFACES(mv::plugin::WriterPluginFactory mv::plugin::PluginFactory)
         Q_OBJECT
         Q_PLUGIN_METADATA(IID   "nl.tudelft.BinExporter"
-            FILE  "BinExporter.json")
+                          FILE  "PluginInfo.json")
 
 public:
     BinExporterFactory();
