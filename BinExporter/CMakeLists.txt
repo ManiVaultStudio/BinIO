@@ -81,7 +81,7 @@ add_custom_command(TARGET ${BINEXPORTER} POST_BUILD
     --prefix ${ManiVault_INSTALL_DIR}/$<CONFIGURATION>
 )
 
-mv_handle_plugin_config(${PCA_PLUGIN})
+mv_handle_plugin_config(${BINEXPORTER})
 
 # -----------------------------------------------------------------------------
 # Miscellaneous
