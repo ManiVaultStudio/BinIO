@@ -5,6 +5,8 @@ import os
 import pathlib
 import subprocess
 from rules_support import PluginBranchInfo
+import shutil
+from conans import tools
 
 class BinIOPluginConan(ConanFile):
     """Class to package BinIOPlugin using conan
