@@ -151,7 +151,7 @@ class BinIOPluginConan(ConanFile):
             pdb_files = pdb_files = [p for p in pathlib.Path(self.build_folder).rglob('*') if p.is_file() and p.suffix.lower() == '.pdb']
             print("PDB(s): ", pdb_files)
             for pfile in pdb_files:
-                shutil.copy(pfile, pdb_dest)
+                shutil.copy(pfile, "package")
                 
         self.copy(pattern="*", src=package_dir)
 
