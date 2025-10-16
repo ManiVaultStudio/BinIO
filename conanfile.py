@@ -141,18 +141,7 @@ class BinIOPluginConan(ConanFile):
                 "--prefix",
                 release_dir,
             ]
-        )
-
-        # Add the pdb files next to the libs for RelWithDebInfo linking
-        if self.settings.os == "Windows":
-            print("Copying PDBs...")
-            pdb_dest = pathlib.Path(package_dir, "RelWithDebInfo", "pdb")
-            pdb_dest.mkdir()
-            pdb_files = pdb_files = [p for p in pathlib.Path(self.build_folder).rglob('*') if p.is_file() and p.suffix.lower() == '.pdb']
-            print("PDB(s): ", pdb_files)
-            for pfile in pdb_files:
-                shutil.copy(pfile, "package")
-                
+        )               
         self.copy(pattern="*", src=package_dir)
 
     def package_info(self):
