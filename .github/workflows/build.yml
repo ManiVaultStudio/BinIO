@@ -69,7 +69,7 @@ jobs:
 
       - name: Windows build
         if: startsWith(runner.os, 'Windows')
-        uses: ManiVaultStudio/github-actions/conan_windows_build@upload_pdbs
+        uses: ManiVaultStudio/github-actions/conan_windows_build@main
         with:
           conan-visual-version: ${{matrix.build-cversion}}
           conan-visual-runtime: ${{matrix.build-runtime}}
@@ -77,12 +77,13 @@ jobs:
           conan-user: ${{secrets.LKEB_UPLOAD_USER}}
           conan-password: ${{secrets.LKEB_UPLOAD_USER_PASSWORD}}
           conan-pem: ${{secrets.LKEB_UPLOAD_CERT_CHAIN}}
+          rs_ssh_key: ${{ secrets.RULESSUPPORT_DEPLOY_KEY }}
+          sentry-enable: startsWith(github.ref, 'refs/heads/release/')
           sentry-url: ${{secrets.LKEB_SENTRY_URL }}
           sentry-org: ${{secrets.LKEB_SENTRY_ORG }}
           sentry-project: ${{secrets.LKEB_SENTRY_PROJECT }}
           sentry-auth-token: ${{secrets.LKEB_SENTRY_AUTH_TOKEN }}
-          rs_ssh_key: ${{ secrets.RULESSUPPORT_DEPLOY_KEY }}
-
+          
       - name: Linux build
         if: startsWith(matrix.os, 'ubuntu')
         uses: ManiVaultStudio/github-actions/conan_linuxmac_build@main
