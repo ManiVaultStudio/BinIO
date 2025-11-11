@@ -69,7 +69,7 @@ jobs:
 
       - name: Windows build
         if: startsWith(runner.os, 'Windows')
-        uses: ManiVaultStudio/github-actions/conan_windows_build@add_centralized_packaging
+        uses: ManiVaultStudio/github-actions/conan_windows_build@feature/add_centralized_packaging
         with:
           conan-visual-version: ${{matrix.build-cversion}}
           conan-visual-runtime: ${{matrix.build-runtime}}
