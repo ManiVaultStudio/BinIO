@@ -1,0 +1,14 @@
+{
+    "inputs": [
+        {
+            "dir": "BinLoader",
+            "name": "Binary loader",
+            "postfix": "Plugins.Loader.BIN"
+        },
+        {
+            "dir": "BinExporter",
+            "name": "Binary exporter",
+            "postfix": "Plugins.Exporter.BIN"
+        }
+    ]
+}
