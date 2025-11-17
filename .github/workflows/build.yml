@@ -73,7 +73,7 @@ jobs:
         run: |
           echo "WS=$GITHUB_WORKSPACE"
           echo "payload=${{ github.workspace }}/_build/RelWithDebInfo"
-          test -d "${{ github.workspace }}/_build/RelWithDebInfo" || { echo "Payload dir missing"; ls -la "${{ github.workspace }}"; exit 1; }
+          test -d "${{ github.workspace }}/BinExporter/_build/RelWithDebInfo" || { echo "Payload dir missing"; ls -la "${{ github.workspace }}"; exit 1; }
           
       - name: Windows build
         if: startsWith(runner.os, 'Windows')
