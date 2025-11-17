@@ -67,13 +67,7 @@ jobs:
           key: ${{ secrets.RULESSUPPORT_DEPLOY_KEY }}
           known_hosts: github.com AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
 
-      - name: Debug paths
-        if: startsWith(runner.os, 'Windows')
-        shell: bash
-        run: |
-          echo "WS=$GITHUB_WORKSPACE"
-          echo "payload=${{ github.workspace }}/_build/RelWithDebInfo"
-          test -d "${{ github.workspace }}/BinExporter/_build/RelWithDebInfo" || { echo "Payload dir missing"; ls -la "${{ github.workspace }}/BinExporter"; exit 1; }
+      
           
       - name: Windows build
         if: startsWith(runner.os, 'Windows')
@@ -89,5 +83,12 @@ jobs:
           packaging-repo-dir: ${{ github.workspace }}
           packaging-payload-dir: ${{ github.workspace }}\_build\RelWithDebInfo
           packaging-branch: ${{ github.ref }}
-          
+
+      - name: Debug paths
+        if: startsWith(runner.os, 'Windows')
+        shell: bash
+        run: |
+          echo "WS=$GITHUB_WORKSPACE"
+          echo "payload=${{ github.workspace }}/_build/RelWithDebInfo"
+          test -d "${{ github.workspace }}/BinExporter/_build/RelWithDebInfo" || { echo "Payload dir missing"; ls -la "${{ github.workspace }}/BinExporter"; exit 1; }
       
