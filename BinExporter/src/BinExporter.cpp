@@ -114,7 +114,7 @@ DataContent BinExporter::retrieveDataSetContent(mv::Dataset<Points> dataSet) con
             {
                 for (unsigned int dimensionId = 0; dimensionId < numDimensions; dimensionId++)
                 {
-                    const auto index = pointId * numDimensions + dimensionId;
+                    const auto index = static_cast<std::uint64_t>(pointId) * numDimensions + dimensionId;
                     dataFromSet.push_back(beginOfData[index]);
                 }
             }
