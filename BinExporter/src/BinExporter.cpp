@@ -21,10 +21,6 @@ BinExporter::BinExporter(const PluginFactory* factory) :
 {
 }
 
-BinExporter::~BinExporter(void)
-{
-}
-
 void BinExporter::init()
 {
 }

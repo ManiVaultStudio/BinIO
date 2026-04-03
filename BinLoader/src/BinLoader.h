@@ -70,7 +70,7 @@ public:
     }
 
     /** Get smart pointer to dataset (if any) */
-    mv::Dataset<mv::DatasetImpl> getSourceDataset() {
+    mv::Dataset<mv::DatasetImpl> getSourceDataset() const {
         return _datasetPickerAction.getCurrentDataset();
     }
 

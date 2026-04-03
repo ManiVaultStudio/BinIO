@@ -67,14 +67,14 @@ public:
     {
         setWindowTitle(tr("Binary Exporter"));
 
-        QLabel* indicesLabel = new QLabel("Save only indices");
+        auto* indicesLabel = new QLabel("Save only indices");
 
         writeButton.setDefault(true);
 
         connect(&writeButton, &QPushButton::pressed, this, &BinExporterDialog::closeDialogAction);
         connect(this, &BinExporterDialog::closeDialog, this, &QDialog::accept);
 
-        QHBoxLayout *layout = new QHBoxLayout();
+        auto*layout = new QHBoxLayout();
         layout->addWidget(indicesLabel);
         layout->addWidget(&saveIndices);
         layout->addWidget(&writeButton);
