@@ -137,13 +137,13 @@ void BinLoader::loadData()
     inputDialog.setModal(true);
 
     // open dialog and wait for user input
-    int ok = inputDialog.exec();
+    const int ok = inputDialog.exec();
 
     if (ok == QDialog::Accepted && !inputDialog.getDatasetName().isEmpty()) {
     
-        auto sourceDataset = inputDialog.getSourceDataset();
-        auto numDims = inputDialog.getNumberOfDimensions();
-        auto storeAs = inputDialog.getStoreAs();
+        const auto sourceDataset = inputDialog.getSourceDataset();
+        const auto numDims = inputDialog.getNumberOfDimensions();
+        const auto storeAs = inputDialog.getStoreAs();
 
         Dataset<Points> point_data;
 

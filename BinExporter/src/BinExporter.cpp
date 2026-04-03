@@ -40,9 +40,9 @@ void BinExporter::writeData()
         _onlyIdices = onlyIdices;
     });
 
-    int ok = inputDialog.exec();
+    const int ok = inputDialog.exec();
 
-    if ((ok == QDialog::Accepted)) {
+    if (ok == QDialog::Accepted) {
 
         // Let the user choose the save path
         const QString registryEntry = "directoryPath";
@@ -67,9 +67,9 @@ void BinExporter::writeData()
             setSetting(registryEntry, QFileInfo(fileName).absolutePath());
 
             // get data from core
-            DataContent dataContent = retrieveDataSetContent(inputDataset);
-            writeVecToBinary(dataContent.dataVals, fileName);
-            writeInfoTextForBinary(fileName, dataContent);
+            const DataContent dataContent = retrieveDataSetContent(inputDataset);
+            writeVecToBinary(fileName, dataContent.dataVals);   // writes to .bin file
+            writeInfoTextForBinary(fileName, dataContent);      // writes to .txt file
             qDebug() << "BinExporter: Data written to disk - File name: " << fileName;
             return;
         }
