@@ -2,6 +2,7 @@
 
 #include <actions/PluginTriggerAction.h>
 
+#include <QDir>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QSettings>
@@ -44,14 +45,14 @@ void BinExporter::writeData()
     if ((ok == QDialog::Accepted)) {
 
         // Let the user choose the save path
-        QString registryEntry = "directoryPath";
-        const auto directoryPath = getSetting(registryEntry, "").toString();
+        const QString registryEntry = "directoryPath";
+        const auto directoryPath = QDir(getSetting(registryEntry, "").toString());
 
-        auto inputDataset = getInputDataset<Points>();
-        QString fileName = QFileDialog::getSaveFileName(
+        const auto inputDataset = getInputDataset<Points>();
+        const QString fileName = QFileDialog::getSaveFileName(
             nullptr, 
             tr("Save data set"), 
-            directoryPath + inputDataset->text() + ".bin", 
+            directoryPath.filePath(inputDataset->text() + ".bin"),
             tr("Binary file (*.bin);;All Files (*)"));
 
         // Only continue when the dialog has not been not canceled and the file name is non-empty.
