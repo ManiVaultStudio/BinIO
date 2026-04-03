@@ -11,21 +11,43 @@
 #include <QLabel>
 #include <QPushButton>
 
+#include <fstream>
+
 using namespace mv::plugin;
 using namespace mv::gui;
+
+// =============================================================================
+// Helper
+// =============================================================================
 
 struct DataContent {
     DataContent() : dataVals{}, numDimensions(0), numPoints(0), isDerived(false), onlyIndices(false), derivedFrom(""), sourceNumDimensions(0), sourceNumPoints(0) {};
     std::vector<float> dataVals;
-    unsigned int numDimensions;
-    unsigned int numPoints;
+    std::uint64_t numDimensions;
+    std::uint64_t numPoints;
 
     bool isDerived;
     bool onlyIndices;
     QString derivedFrom;
-    unsigned int sourceNumDimensions;
-    unsigned int sourceNumPoints;
+    std::uint64_t sourceNumDimensions;
+    std::uint64_t sourceNumPoints;
 };
+
+/*! Write vector contents to disk
+ * Stores content in little endian binary form.
+ * Overrides existing files with at the given path.
+ *
+ * \param vec Data to write to disk
+ * \param writePath Target path
+*/
+template<typename T>
+void writeVecToBinary(const QString& writePath, const std::vector<T>& vec) {
+    std::ofstream fout(writePath.toStdString(), std::ofstream::out | std::ofstream::binary);
+    fout.write(reinterpret_cast<const char*>(vec.data()), vec.size() * sizeof(T));
+    fout.close();
+}
+
+void writeInfoTextForBinary(const QString& writePath, const DataContent& dataContent);
 
 // =============================================================================
 // Loading input box
@@ -40,19 +62,19 @@ class BinExporterDialog : public QDialog
 {
     Q_OBJECT
 public:
-    BinExporterDialog(QWidget* parent) :
+    explicit BinExporterDialog(QWidget* parent) :
         QDialog(parent), writeButton(tr("Write file"))
     {
         setWindowTitle(tr("Binary Exporter"));
 
-        QLabel* indicesLabel = new QLabel("Save only indices");
+        auto* indicesLabel = new QLabel("Save only indices");
 
         writeButton.setDefault(true);
 
         connect(&writeButton, &QPushButton::pressed, this, &BinExporterDialog::closeDialogAction);
         connect(this, &BinExporterDialog::closeDialog, this, &QDialog::accept);
 
-        QHBoxLayout *layout = new QHBoxLayout();
+        auto*layout = new QHBoxLayout();
         layout->addWidget(indicesLabel);
         layout->addWidget(&saveIndices);
         layout->addWidget(&writeButton);
@@ -81,8 +103,8 @@ class BinExporter : public WriterPlugin
 {
     Q_OBJECT
 public:
-    BinExporter(const PluginFactory* factory);
-    ~BinExporter(void) override;
+    explicit BinExporter(const PluginFactory* factory);
+    ~BinExporter(void) override = default;
 
     void init() override;
 
@@ -91,21 +113,9 @@ public:
 private:
     /*! Get data set contents from core
      *
-     * \param dataSetName Data set name to request from core
+     * \param dataset Data set to request from core
     */
-    DataContent retrieveDataSetContent(mv::Dataset<Points> dataSet) const;
-
-    /*! Write vector contents to disk
-     * Stores content in little endian binary form.
-     * Overrides existing files with at the given path.
-     *
-     * \param vec Data to write to disk
-     * \param writePath Target path
-    */
-    template<typename T>
-    void writeVecToBinary(std::vector<T> vec, QString writePath);
-
-    void writeInfoTextForBinary(QString writePath, DataContent& dataContent);
+    DataContent retrieveDataSetContent(const mv::Dataset<Points>& dataset) const;
 
 private:
     bool _onlyIdices;   // save indices, e.g. of a selection instead of data values
@@ -126,8 +136,7 @@ class BinExporterFactory : public WriterPluginFactory
 
 public:
     BinExporterFactory();
-
-    ~BinExporterFactory(void) override {}
+    ~BinExporterFactory(void) override = default;
 
     WriterPlugin* produce() override;
 

@@ -21,11 +21,6 @@ using namespace mv::gui;
 // View
 // =============================================================================
 
-BinLoader::~BinLoader(void)
-{
-
-}
-
 void BinLoader::init()
 {
 
@@ -125,7 +120,7 @@ void BinLoader::loadData()
         in.seekg(0, std::ios::end);
         contents.resize(in.tellg());
         in.seekg(0, std::ios::beg);
-        in.read(&contents[0], contents.size());
+        in.read(contents.data(), contents.size());
         in.close();
     }
     else
@@ -137,27 +132,22 @@ void BinLoader::loadData()
     inputDialog.setModal(true);
 
     // open dialog and wait for user input
-    int ok = inputDialog.exec();
+    const int ok = inputDialog.exec();
 
     if (ok == QDialog::Accepted && !inputDialog.getDatasetName().isEmpty()) {
     
-        auto sourceDataset = inputDialog.getSourceDataset();
-        auto numDims = inputDialog.getNumberOfDimensions();
-        auto storeAs = inputDialog.getStoreAs();
+        const auto sourceDataset = inputDialog.getSourceDataset();
+        const auto numDims = inputDialog.getNumberOfDimensions();
+        const auto storeAs = inputDialog.getStoreAs();
 
-        Dataset<Points> point_data;
+        Dataset<Points> point_data = sourceDataset.isValid() ?
+            mv::data().createDerivedDataset<Points>(inputDialog.getDatasetName(), sourceDataset) :
+            mv::data().createDataset<Points>("Points", inputDialog.getDatasetName());
 
-        if (sourceDataset.isValid())
-            point_data = mv::data().createDerivedDataset<Points>(inputDialog.getDatasetName(), sourceDataset);
-        else
-            point_data = mv::data().createDataset<Points>("Points", inputDialog.getDatasetName());
-
-        if (inputDialog.getDataType() == BinaryDataType::FLOAT)
-        {
+        if (inputDialog.getDataType() == BinaryDataType::FLOAT) {
             recursiveReadDataAndAddToCore<float>(storeAs, point_data, numDims, contents);
         }
-        else if (inputDialog.getDataType() == BinaryDataType::UBYTE)
-        {
+        else if (inputDialog.getDataType() == BinaryDataType::UBYTE) {
             recursiveReadDataAndAddToCore<unsigned char>(storeAs, point_data, numDims, contents);
         }
     }

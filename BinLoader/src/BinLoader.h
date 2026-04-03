@@ -70,7 +70,7 @@ public:
     }
 
     /** Get smart pointer to dataset (if any) */
-    mv::Dataset<mv::DatasetImpl> getSourceDataset() {
+    mv::Dataset<mv::DatasetImpl> getSourceDataset() const {
         return _datasetPickerAction.getCurrentDataset();
     }
 
@@ -93,8 +93,8 @@ class BinLoader : public LoaderPlugin
 {
     Q_OBJECT
 public:
-    BinLoader(const PluginFactory* factory) : LoaderPlugin(factory) { }
-    ~BinLoader(void) override;
+    explicit BinLoader(const PluginFactory* factory) : LoaderPlugin(factory) { }
+    ~BinLoader(void) override = default;
 
     void init() override;
 
@@ -115,8 +115,7 @@ class BinLoaderFactory : public LoaderPluginFactory
 
 public:
     BinLoaderFactory(void);
-
-    ~BinLoaderFactory(void) override {}
+    ~BinLoaderFactory(void) override = default;
 
     LoaderPlugin* produce() override;
 

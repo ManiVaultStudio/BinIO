@@ -2,11 +2,11 @@
 
 #include <actions/PluginTriggerAction.h>
 
+#include <QDir>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QSettings>
 
-#include <fstream>
 #include <numeric>
 #include <vector>
 
@@ -18,10 +18,6 @@ using namespace mv::gui;
 BinExporter::BinExporter(const PluginFactory* factory) :
     WriterPlugin(factory),
     _onlyIdices(false)
-{
-}
-
-BinExporter::~BinExporter(void)
 {
 }
 
@@ -40,19 +36,19 @@ void BinExporter::writeData()
         _onlyIdices = onlyIdices;
     });
 
-    int ok = inputDialog.exec();
+    const int ok = inputDialog.exec();
 
-    if ((ok == QDialog::Accepted)) {
+    if (ok == QDialog::Accepted) {
 
         // Let the user choose the save path
-        QString registryEntry = "directoryPath";
-        const auto directoryPath = getSetting(registryEntry, "").toString();
+        const QString registryEntry = "directoryPath";
+        const auto directoryPath = QDir(getSetting(registryEntry, "").toString());
 
-        auto inputDataset = getInputDataset<Points>();
-        QString fileName = QFileDialog::getSaveFileName(
+        const auto inputDataset = getInputDataset<Points>();
+        const QString fileName = QFileDialog::getSaveFileName(
             nullptr, 
             tr("Save data set"), 
-            directoryPath + inputDataset->text() + ".bin", 
+            directoryPath.filePath(inputDataset->text() + ".bin"),
             tr("Binary file (*.bin);;All Files (*)"));
 
         // Only continue when the dialog has not been not canceled and the file name is non-empty.
@@ -67,9 +63,9 @@ void BinExporter::writeData()
             setSetting(registryEntry, QFileInfo(fileName).absolutePath());
 
             // get data from core
-            DataContent dataContent = retrieveDataSetContent(inputDataset);
-            writeVecToBinary(dataContent.dataVals, fileName);
-            writeInfoTextForBinary(fileName, dataContent);
+            const DataContent dataContent = retrieveDataSetContent(inputDataset);
+            writeVecToBinary(fileName, dataContent.dataVals);   // writes to .bin file
+            writeInfoTextForBinary(fileName, dataContent);      // writes to .txt file
             qDebug() << "BinExporter: Data written to disk - File name: " << fileName;
             return;
         }
@@ -81,34 +77,35 @@ void BinExporter::writeData()
     }
 }
 
-DataContent BinExporter::retrieveDataSetContent(mv::Dataset<Points> dataSet) const {
+DataContent BinExporter::retrieveDataSetContent(const mv::Dataset<Points>& dataset) const {
     DataContent dataContent;
     std::vector<float> dataFromSet;
 
     // Get number of enabled dimensions
-    unsigned int numDimensions = dataSet->getNumDimensions();
+    const std::uint64_t numDimensions = dataset->getNumDimensions();
+    const std::uint64_t numPoints = dataset->getNumPoints();
 
     if (_onlyIdices) // Instead of saving the data values, you might want to save the IDs of a selection
     {
-        std::transform(dataSet->indices.begin(), dataSet->indices.end(), std::back_inserter(dataFromSet), [](int x) { return (float)x; });
+        std::ranges::transform(dataset->indices, std::back_inserter(dataFromSet), [](const int x) { return static_cast<float>(x); });
         dataContent.onlyIndices = true;
     }
     else
     {
         // Get indices of selected points
-        std::vector<unsigned int> pointIDsGlobal = dataSet->indices;
+        std::vector<unsigned int> pointIDsGlobal = dataset->indices;
         // If points represent all data set, select them all
-        if (dataSet->isFull()) {
-            std::vector<unsigned int> all(dataSet->getNumPoints());
+        if (dataset->isFull()) {
+            std::vector<unsigned int> all(numPoints);
             std::iota(std::begin(all), std::end(all), 0);
 
-            pointIDsGlobal = all;
+            std::swap(pointIDsGlobal, all);
         }
 
         // For all selected points, retrieve values from each dimension
         dataFromSet.reserve(pointIDsGlobal.size() * numDimensions);
 
-        dataSet->visitFromBeginToEnd([&dataFromSet, &pointIDsGlobal, &numDimensions](auto beginOfData, auto endOfData)
+        dataset->visitFromBeginToEnd([&dataFromSet, &pointIDsGlobal, &numDimensions](auto beginOfData, auto endOfData)
         {
             for (const auto& pointId : pointIDsGlobal)
             {
@@ -124,13 +121,13 @@ DataContent BinExporter::retrieveDataSetContent(mv::Dataset<Points> dataSet) con
     // Data content for writing to disk
     dataContent.dataVals = dataFromSet;
     dataContent.numDimensions = numDimensions;
-    dataContent.numPoints = dataSet->getNumPoints();
+    dataContent.numPoints = numPoints;
 
-    if (dataSet->isDerivedData())
+    if (dataset->isDerivedData())
     {
         dataContent.isDerived = true;
 
-        auto sourceData = dataSet->getSourceDataset<Points>();
+        auto sourceData = dataset->getSourceDataset<Points>();
 
         dataContent.derivedFrom = sourceData->text();
         dataContent.sourceNumDimensions = sourceData->getNumDimensions();
@@ -140,40 +137,6 @@ DataContent BinExporter::retrieveDataSetContent(mv::Dataset<Points> dataSet) con
     return dataContent;
 }
 
-template<typename T>
-void BinExporter::writeVecToBinary(std::vector<T> vec, QString writePath) {
-    std::ofstream fout(writePath.toStdString(), std::ofstream::out | std::ofstream::binary);
-    fout.write(reinterpret_cast<const char*>(vec.data()), vec.size() * sizeof(T));
-    fout.close();
-}
-
-
-void BinExporter::writeInfoTextForBinary(QString writePath, DataContent& dataContent) {
-    std::string infoText;
-    std::string fileName = QFileInfo(writePath).fileName().toStdString();
-
-    infoText += fileName + "\n";
-    infoText += "Num dimensions: " + std::to_string(dataContent.numDimensions) + "\n";
-    infoText += "Num data points: " + std::to_string(dataContent.numPoints) + "\n";
-    infoText += "Data type: float \n";			// currently hard=coded	
-
-    if (dataContent.isDerived)
-    {
-        infoText += "Derived: true \n";
-        infoText += "Source data: " + dataContent.derivedFrom.toStdString() + "\n";
-        infoText += "Num dimensions (source): " + std::to_string(dataContent.sourceNumDimensions) + "\n";
-        infoText += "Num data points (source): " + std::to_string(dataContent.sourceNumPoints) + "\n";
-    }
-
-    if (dataContent.onlyIndices)
-    {
-        infoText += "Contains only indices (e.g. of a selection) \n";
-    }
-
-    std::ofstream fout(writePath.section(".", 0, 0).toStdString() + ".txt");
-    fout << infoText;
-    fout.close();
-}
 
 // =============================================================================
 // Factory
@@ -217,3 +180,35 @@ PluginTriggerActions BinExporterFactory::getPluginTriggerActions(const mv::Datas
 
     return pluginTriggerActions;
 }
+
+// =============================================================================
+// Helper
+// =============================================================================
+
+void writeInfoTextForBinary(const QString& writePath, const DataContent& dataContent) {
+    const std::string fileName = QFileInfo(writePath).fileName().toStdString();
+
+    std::string infoText;
+    infoText += fileName + "\n";
+    infoText += "Num dimensions: " + std::to_string(dataContent.numDimensions) + "\n";
+    infoText += "Num data points: " + std::to_string(dataContent.numPoints) + "\n";
+    infoText += "Data type: float \n";			// currently hard=coded	
+
+    if (dataContent.isDerived)
+    {
+        infoText += "Derived: true \n";
+        infoText += "Source data: " + dataContent.derivedFrom.toStdString() + "\n";
+        infoText += "Num dimensions (source): " + std::to_string(dataContent.sourceNumDimensions) + "\n";
+        infoText += "Num data points (source): " + std::to_string(dataContent.sourceNumPoints) + "\n";
+    }
+
+    if (dataContent.onlyIndices)
+    {
+        infoText += "Contains only indices (e.g. of a selection) \n";
+    }
+
+    std::ofstream fout(writePath.section(".", 0, 0).toStdString() + ".txt");
+    fout << infoText;
+    fout.close();
+}
+
