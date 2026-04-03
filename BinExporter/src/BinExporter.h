@@ -17,14 +17,14 @@ using namespace mv::gui;
 struct DataContent {
     DataContent() : dataVals{}, numDimensions(0), numPoints(0), isDerived(false), onlyIndices(false), derivedFrom(""), sourceNumDimensions(0), sourceNumPoints(0) {};
     std::vector<float> dataVals;
-    unsigned int numDimensions;
-    unsigned int numPoints;
+    std::uint64_t numDimensions;
+    std::uint64_t numPoints;
 
     bool isDerived;
     bool onlyIndices;
     QString derivedFrom;
-    unsigned int sourceNumDimensions;
-    unsigned int sourceNumPoints;
+    std::uint64_t sourceNumDimensions;
+    std::uint64_t sourceNumPoints;
 };
 
 // =============================================================================
@@ -91,9 +91,9 @@ public:
 private:
     /*! Get data set contents from core
      *
-     * \param dataSetName Data set name to request from core
+     * \param dataset Data set to request from core
     */
-    DataContent retrieveDataSetContent(mv::Dataset<Points> dataSet) const;
+    DataContent retrieveDataSetContent(const mv::Dataset<Points>& dataset) const;
 
     /*! Write vector contents to disk
      * Stores content in little endian binary form.

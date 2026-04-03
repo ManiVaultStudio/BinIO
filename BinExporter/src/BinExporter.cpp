@@ -81,34 +81,35 @@ void BinExporter::writeData()
     }
 }
 
-DataContent BinExporter::retrieveDataSetContent(mv::Dataset<Points> dataSet) const {
+DataContent BinExporter::retrieveDataSetContent(const mv::Dataset<Points>& dataset) const {
     DataContent dataContent;
     std::vector<float> dataFromSet;
 
     // Get number of enabled dimensions
-    unsigned int numDimensions = dataSet->getNumDimensions();
+    const std::uint64_t numDimensions = dataset->getNumDimensions();
+    const std::uint64_t numPoints = dataset->getNumPoints();
 
     if (_onlyIdices) // Instead of saving the data values, you might want to save the IDs of a selection
     {
-        std::transform(dataSet->indices.begin(), dataSet->indices.end(), std::back_inserter(dataFromSet), [](int x) { return (float)x; });
+        std::ranges::transform(dataset->indices, std::back_inserter(dataFromSet), [](const int x) { return static_cast<float>(x); });
         dataContent.onlyIndices = true;
     }
     else
     {
         // Get indices of selected points
-        std::vector<unsigned int> pointIDsGlobal = dataSet->indices;
+        std::vector<unsigned int> pointIDsGlobal = dataset->indices;
         // If points represent all data set, select them all
-        if (dataSet->isFull()) {
-            std::vector<unsigned int> all(dataSet->getNumPoints());
+        if (dataset->isFull()) {
+            std::vector<unsigned int> all(numPoints);
             std::iota(std::begin(all), std::end(all), 0);
 
-            pointIDsGlobal = all;
+            std::swap(pointIDsGlobal, all);
         }
 
         // For all selected points, retrieve values from each dimension
         dataFromSet.reserve(pointIDsGlobal.size() * numDimensions);
 
-        dataSet->visitFromBeginToEnd([&dataFromSet, &pointIDsGlobal, &numDimensions](auto beginOfData, auto endOfData)
+        dataset->visitFromBeginToEnd([&dataFromSet, &pointIDsGlobal, &numDimensions](auto beginOfData, auto endOfData)
         {
             for (const auto& pointId : pointIDsGlobal)
             {
@@ -124,13 +125,13 @@ DataContent BinExporter::retrieveDataSetContent(mv::Dataset<Points> dataSet) con
     // Data content for writing to disk
     dataContent.dataVals = dataFromSet;
     dataContent.numDimensions = numDimensions;
-    dataContent.numPoints = dataSet->getNumPoints();
+    dataContent.numPoints = numPoints;
 
-    if (dataSet->isDerivedData())
+    if (dataset->isDerivedData())
     {
         dataContent.isDerived = true;
 
-        auto sourceData = dataSet->getSourceDataset<Points>();
+        auto sourceData = dataset->getSourceDataset<Points>();
 
         dataContent.derivedFrom = sourceData->text();
         dataContent.sourceNumDimensions = sourceData->getNumDimensions();
