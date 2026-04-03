@@ -6,7 +6,6 @@
 #include <QFileInfo>
 #include <QSettings>
 
-#include <fstream>
 #include <numeric>
 #include <vector>
 
@@ -141,40 +140,6 @@ DataContent BinExporter::retrieveDataSetContent(const mv::Dataset<Points>& datas
     return dataContent;
 }
 
-template<typename T>
-void BinExporter::writeVecToBinary(std::vector<T> vec, QString writePath) {
-    std::ofstream fout(writePath.toStdString(), std::ofstream::out | std::ofstream::binary);
-    fout.write(reinterpret_cast<const char*>(vec.data()), vec.size() * sizeof(T));
-    fout.close();
-}
-
-
-void BinExporter::writeInfoTextForBinary(QString writePath, DataContent& dataContent) {
-    std::string infoText;
-    std::string fileName = QFileInfo(writePath).fileName().toStdString();
-
-    infoText += fileName + "\n";
-    infoText += "Num dimensions: " + std::to_string(dataContent.numDimensions) + "\n";
-    infoText += "Num data points: " + std::to_string(dataContent.numPoints) + "\n";
-    infoText += "Data type: float \n";			// currently hard=coded	
-
-    if (dataContent.isDerived)
-    {
-        infoText += "Derived: true \n";
-        infoText += "Source data: " + dataContent.derivedFrom.toStdString() + "\n";
-        infoText += "Num dimensions (source): " + std::to_string(dataContent.sourceNumDimensions) + "\n";
-        infoText += "Num data points (source): " + std::to_string(dataContent.sourceNumPoints) + "\n";
-    }
-
-    if (dataContent.onlyIndices)
-    {
-        infoText += "Contains only indices (e.g. of a selection) \n";
-    }
-
-    std::ofstream fout(writePath.section(".", 0, 0).toStdString() + ".txt");
-    fout << infoText;
-    fout.close();
-}
 
 // =============================================================================
 // Factory
@@ -218,3 +183,35 @@ PluginTriggerActions BinExporterFactory::getPluginTriggerActions(const mv::Datas
 
     return pluginTriggerActions;
 }
+
+// =============================================================================
+// Helper
+// =============================================================================
+
+void writeInfoTextForBinary(const QString& writePath, const DataContent& dataContent) {
+    const std::string fileName = QFileInfo(writePath).fileName().toStdString();
+
+    std::string infoText;
+    infoText += fileName + "\n";
+    infoText += "Num dimensions: " + std::to_string(dataContent.numDimensions) + "\n";
+    infoText += "Num data points: " + std::to_string(dataContent.numPoints) + "\n";
+    infoText += "Data type: float \n";			// currently hard=coded	
+
+    if (dataContent.isDerived)
+    {
+        infoText += "Derived: true \n";
+        infoText += "Source data: " + dataContent.derivedFrom.toStdString() + "\n";
+        infoText += "Num dimensions (source): " + std::to_string(dataContent.sourceNumDimensions) + "\n";
+        infoText += "Num data points (source): " + std::to_string(dataContent.sourceNumPoints) + "\n";
+    }
+
+    if (dataContent.onlyIndices)
+    {
+        infoText += "Contains only indices (e.g. of a selection) \n";
+    }
+
+    std::ofstream fout(writePath.section(".", 0, 0).toStdString() + ".txt");
+    fout << infoText;
+    fout.close();
+}
+

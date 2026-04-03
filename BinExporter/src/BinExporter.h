@@ -11,8 +11,14 @@
 #include <QLabel>
 #include <QPushButton>
 
+#include <fstream>
+
 using namespace mv::plugin;
 using namespace mv::gui;
+
+// =============================================================================
+// Helper
+// =============================================================================
 
 struct DataContent {
     DataContent() : dataVals{}, numDimensions(0), numPoints(0), isDerived(false), onlyIndices(false), derivedFrom(""), sourceNumDimensions(0), sourceNumPoints(0) {};
@@ -26,6 +32,22 @@ struct DataContent {
     std::uint64_t sourceNumDimensions;
     std::uint64_t sourceNumPoints;
 };
+
+/*! Write vector contents to disk
+ * Stores content in little endian binary form.
+ * Overrides existing files with at the given path.
+ *
+ * \param vec Data to write to disk
+ * \param writePath Target path
+*/
+template<typename T>
+void writeVecToBinary(const QString& writePath, const std::vector<T>& vec) {
+    std::ofstream fout(writePath.toStdString(), std::ofstream::out | std::ofstream::binary);
+    fout.write(reinterpret_cast<const char*>(vec.data()), vec.size() * sizeof(T));
+    fout.close();
+}
+
+void writeInfoTextForBinary(const QString& writePath, const DataContent& dataContent);
 
 // =============================================================================
 // Loading input box
@@ -94,18 +116,6 @@ private:
      * \param dataset Data set to request from core
     */
     DataContent retrieveDataSetContent(const mv::Dataset<Points>& dataset) const;
-
-    /*! Write vector contents to disk
-     * Stores content in little endian binary form.
-     * Overrides existing files with at the given path.
-     *
-     * \param vec Data to write to disk
-     * \param writePath Target path
-    */
-    template<typename T>
-    void writeVecToBinary(std::vector<T> vec, QString writePath);
-
-    void writeInfoTextForBinary(QString writePath, DataContent& dataContent);
 
 private:
     bool _onlyIdices;   // save indices, e.g. of a selection instead of data values
