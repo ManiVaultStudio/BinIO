@@ -62,7 +62,7 @@ class BinExporterDialog : public QDialog
 {
     Q_OBJECT
 public:
-    BinExporterDialog(QWidget* parent) :
+    explicit BinExporterDialog(QWidget* parent) :
         QDialog(parent), writeButton(tr("Write file"))
     {
         setWindowTitle(tr("Binary Exporter"));
@@ -103,8 +103,8 @@ class BinExporter : public WriterPlugin
 {
     Q_OBJECT
 public:
-    BinExporter(const PluginFactory* factory);
-    ~BinExporter(void) override;
+    explicit BinExporter(const PluginFactory* factory);
+    ~BinExporter(void) override = default;
 
     void init() override;
 
@@ -136,8 +136,7 @@ class BinExporterFactory : public WriterPluginFactory
 
 public:
     BinExporterFactory();
-
-    ~BinExporterFactory(void) override {}
+    ~BinExporterFactory(void) override = default;
 
     WriterPlugin* produce() override;
 
