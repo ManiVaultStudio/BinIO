@@ -113,7 +113,6 @@ class BinIOPluginConan(ConanFile):
 
         cmake = self._configure_cmake()
         cmake.build(build_type="RelWithDebInfo")
-        cmake.build(build_type="Release")
 
     def package(self):
         package_dir = pathlib.Path(self.build_folder, "package")
@@ -131,23 +130,20 @@ class BinIOPluginConan(ConanFile):
                 relWithDebInfo_dir,
             ]
         )
-        subprocess.run(
-            [
-                "cmake",
-                "--install",
-                self.build_folder,
-                "--config",
-                "Release",
-                "--prefix",
-                release_dir,
-            ]
-        )               
+
+        # Add the pdb files next to the libs for RelWithDebInfo linking
+        if self.settings.os == "Windows":
+            print("Copying PDBs...")
+            pdb_dest = pathlib.Path(package_dir, "RelWithDebInfo", "pdb")
+            pdb_dest.mkdir()
+            pdb_files = pdb_files = [p for p in pathlib.Path(self.build_folder).rglob('*') if p.is_file() and p.suffix.lower() == '.pdb']
+            print("PDB(s): ", pdb_files)
+            for pfile in pdb_files:
+                shutil.copy(pfile, pdb_dest)
+                
         self.copy(pattern="*", src=package_dir)
 
     def package_info(self):
         self.cpp_info.relwithdebinfo.libdirs = ["RelWithDebInfo/lib"]
         self.cpp_info.relwithdebinfo.bindirs = ["RelWithDebInfo/Plugins", "RelWithDebInfo"]
         self.cpp_info.relwithdebinfo.includedirs = ["RelWithDebInfo/include", "RelWithDebInfo"]
-        self.cpp_info.release.libdirs = ["Release/lib"]
-        self.cpp_info.release.bindirs = ["Release/Plugins", "Release"]
-        self.cpp_info.release.includedirs = ["Release/include", "Release"]
